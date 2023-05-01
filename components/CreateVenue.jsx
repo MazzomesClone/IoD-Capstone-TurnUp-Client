@@ -7,7 +7,7 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import PlaceIcon from '@mui/icons-material/Place';
+import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import { useEffect, useState } from 'react'
@@ -18,6 +18,7 @@ import { useFormControl } from '../hooks/useFormControl';
 import axios from 'axios';
 import { useImageUpload } from '../hooks/useImageUpload';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 export default function CreateVenue() {
 
@@ -50,8 +51,7 @@ export default function CreateVenue() {
         setImg({ preview: '', data: '' })
     }
 
-    async function handleSubmit() {
-        console.log(locationResult)
+    function handleSubmit() {
         const newVenueData = {
             data: {
                 ...locationResult,
@@ -67,7 +67,10 @@ export default function CreateVenue() {
                 'Content-Type': 'multipart/form-data'
             }
         })
-            .then(({ data }) => navigate(`/venues/${data.newId}`))
+            .then(({ data }) => {
+                toast.success('Venue created!')
+                navigate(`/venues/${data.newId}`)
+            })
             .catch(err => console.log(err))
     }
 
@@ -77,7 +80,7 @@ export default function CreateVenue() {
                 <Box p={isMobile ? 3 : 1.5}>
                     <Stack spacing={2}>
                         <Stack direction='row'>
-                            <PlaceIcon />
+                            <AddLocationAltIcon />
                             <Typography variant='h5' ml={1}>
                                 Create Venue
                             </Typography>
@@ -130,7 +133,8 @@ export default function CreateVenue() {
                                         backgroundPosition: 'center'
                                     }} />
                                 }
-                                <Stack direction='row' justifyContent='center' my={1.5}>
+                                <Divider />
+                                <Stack direction='row' justifyContent='center' my={3}>
                                     <Button component="label" endIcon={<PhotoCamera />}>
                                         {img.preview ? 'Change image' : 'Upload image'}
                                         <input hidden name='file' accept="image/*" type="file" onChange={handleImgChange} />
@@ -141,7 +145,8 @@ export default function CreateVenue() {
                                         </Button>
                                     }
                                 </Stack>
-                                <Grid container spacing={2} mb={3}>
+                                <Divider />
+                                <Grid container spacing={2} mt={1} mb={3}>
                                     <Grid item xs={12} sm={6}>
                                         <Stack spacing={2}>
                                             <TextField fullWidth variant='standard' label='Venue name' required {...nameProps} />
@@ -159,9 +164,12 @@ export default function CreateVenue() {
                             </Stack>
                         }
                         <Button
+                            sx={{ width: '100%', maxWidth: '25em', alignSelf: 'center' }}
+                            size='large'
                             onClick={handleSubmit}
                             disabled={venueExists || !nameProps.value}
-                            variant='contained'>
+                            variant='contained'
+                        >
                             Create venue
                         </Button>
                     </Stack>

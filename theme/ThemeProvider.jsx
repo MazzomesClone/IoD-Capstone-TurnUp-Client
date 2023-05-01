@@ -3,6 +3,7 @@ import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { useTheme, ThemeProvider, createTheme } from '@mui/material/styles';
 import { useState, useContext, useMemo, createContext } from 'react';
+import { useMediaQuery } from '@mui/material';
 
 export const ColorModeContext = createContext({ toggleColorMode: () => { } });
 
@@ -43,10 +44,23 @@ export function ToggleThemeButton() {
     const { colorMode } = useContext(ColorModeContext);
     const mode = theme.palette.mode
     return (
-        <Button sx={{ ml: 1 }} onClick={colorMode.toggleColorMode} >
+        <Button sx={{ ml: 1 }} onClick={colorMode.toggleColorMode}>
             {mode === 'dark' ? 'Light' : 'Dark'} mode&nbsp;&nbsp;{mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
         </Button>
     );
+}
+
+export function useSetThemeMode() {
+    const { setMode } = useContext(ColorModeContext)
+    return setMode
+}
+
+export function useSetThemeModeToDefault() {
+    const { setMode, prefersDarkMode } = useContext(ColorModeContext)
+    function setThemeModeToDefault() {
+        setMode(prefersDarkMode ? 'dark' : 'light')
+    }
+    return setThemeModeToDefault
 }
 
 export function useIsDarkMode() {
@@ -55,7 +69,9 @@ export function useIsDarkMode() {
 }
 
 export default function ThemeWrapper({ children }) {
-    const [mode, setMode] = useState('light');
+    const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
+    const [mode, setMode] = useState(prefersDarkMode ? 'dark' : 'light')
+
     const colorMode = useMemo(
         () => ({
             toggleColorMode: () => {
@@ -72,7 +88,7 @@ export default function ThemeWrapper({ children }) {
     );
 
     return (
-        <ColorModeContext.Provider value={{ colorMode, mode }}>
+        <ColorModeContext.Provider value={{ colorMode, mode, setMode, prefersDarkMode }}>
             <ThemeProvider theme={theme}>
                 {children}
             </ThemeProvider>

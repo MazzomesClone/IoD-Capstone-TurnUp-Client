@@ -1,12 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
 
 :root {
   --toastify-text-color-light: rgba(0, 0, 0, 0.87);
-  --toastify-text-color-dark: rgba(255, 255, 255, 0.7);
+  --toastify-text-color-dark: rgba(255, 255, 255);
+  --toastify-color-dark: #1e1e1e;
   --toastify-color-success: #66bb6a;
   --toastify-toast-width: 300px;
 }
 
 body {
   margin: 0;
+  overflow-x: hidden;
 }
+
+/* a {
+  all: unset;
+  cursor: pointer;
+}
+
+a:hover {
+  text-decoration: underline;
+} */

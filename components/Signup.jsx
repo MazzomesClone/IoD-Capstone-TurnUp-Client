@@ -72,7 +72,7 @@ export default function SignUp() {
                     <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
                         <LockOutlinedIcon />
                     </Avatar>
-                    <Typography component="h1" variant="h5">
+                    <Typography fontFamily='Pacifico' component="h1" fontSize='2em'>
                         Sign up to TurnUp
                     </Typography>
                     <Box component="form" onSubmit={handleSignup} sx={{ mt: 3 }}>

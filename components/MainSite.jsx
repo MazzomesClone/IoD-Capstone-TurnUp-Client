@@ -2,13 +2,13 @@ import { Outlet } from 'react-router-dom'
 import NavBar from '../components/NavBar'
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
-import { useState } from 'react'
+import { useIsSiteInitialised } from '../context/UserContext';
 
 export default function MainSite() {
 
-    const [loading, setLoading] = useState(false)
+    const isInitialised = useIsSiteInitialised()
 
-    if (loading) return (
+    if (!isInitialised) return (
         <Box sx={{
             minHeight: '100vh',
             display: 'flex',

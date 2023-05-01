@@ -12,11 +12,19 @@ import UserProvider from "../context/UserContext";
 import { ToastContainer } from "react-toastify";
 import { useIsDarkMode } from "../theme/ThemeProvider";
 import 'react-toastify/dist/ReactToastify.css';
+import RestrictedPage from "../components/RestrictedPage";
+import CreateEvent from "../components/CreateEvent";
+import Browse, { BrowseTabPack } from "../components/Browse";
+import SavedEvents from "../components/SavedEvents";
+import SavedVenues from "../components/SavedVenues";
+import Hosting from "../components/Hosting";
 
 function App() {
 
+  const { pageRoute: browseRoute, routePathsAndComponents: BrowseTabComponents } = BrowseTabPack
   const { pageRoute: venueRoute, routePathsAndComponents: VenueTabComponents } = VenueTabPack
   const { pageRoute: eventRoute, routePathsAndComponents: EventTabComponents } = EventTabPack
+
 
   const isDarkMode = useIsDarkMode()
 
@@ -36,11 +44,22 @@ function App() {
 
           <Route path="/" element={<MainSite />}>
 
-            <Route path="account/" element={<Account />} />
-            <Route path="settings/" element={<Settings />} />
-            <Route path="events/" element={<>All events</>} />
-            <Route path="venues/" element={<>All venues</>} />
-            <Route path="venues/create/" element={<CreateVenue />} />
+            <Route index element={<Navigate to='/browse/events' replace />} />
+            <Route path={browseRoute} element={<Browse />} >
+              <Route index element={<Navigate to='events' replace />} />
+              {BrowseTabComponents.map(({ path, component }) => <Route path={path} element={component} key={path} />)}
+            </Route>
+
+            <Route path='savedevents' element={<SavedEvents />} />
+            <Route path='savedvenues' element={<SavedVenues />} />
+            <Route path='hosting' element={<Hosting />} />
+
+            <Route path="account/" element={<RestrictedPage><Account /></RestrictedPage>} />
+            <Route path="settings/" element={<RestrictedPage><Settings /></RestrictedPage>} />
+            <Route path="events/" element={<Navigate to='/browse' replace />} />
+            <Route path="events/create/" element={<RestrictedPage><CreateEvent /></RestrictedPage>} />
+            <Route path="venues/" element={<Navigate to='/browse' replace />} />
+            <Route path="venues/create/" element={<RestrictedPage><CreateVenue /></RestrictedPage>} />
 
             <Route path={venueRoute} element={<SingleVenuePage />}>
               <Route index element={<Navigate to={'events'} replace />} />

@@ -2,6 +2,7 @@ import axios from 'axios'
 import { createContext, useContext, useEffect, useState } from "react"
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { useSetThemeMode, useSetThemeModeToDefault } from '../theme/ThemeProvider'
 
 const UserContext = createContext(null)
 
@@ -18,15 +19,28 @@ async function verifyCookie() {
 export default function UserProvider({ children }) {
 
     const navigate = useNavigate()
+
     const [user, setUser] = useState(null)
+    const [initialised, setInitialised] = useState(false)
+
     const [savedVenues, setSavedVenues] = useState(null)
     const [savedEvents, setSavedEvents] = useState(null)
+
     const [signinMsg, setSigninMsg] = useState({ msg: '', color: 'inherit' })
     const [signupMsg, setSignupMsg] = useState({ msg: '', color: 'inherit' })
+
+    const setThemeMode = useSetThemeMode()
+    const setThemeModeToDefault = useSetThemeModeToDefault()
 
     async function initUser() {
         const userData = await verifyCookie()
         setUser(userData)
+
+        if (userData?.themeMode) setThemeMode(userData.themeMode)
+        else setThemeModeToDefault()
+
+        setInitialised(true)
+        return userData
     }
 
     useEffect(() => {
@@ -58,25 +72,26 @@ export default function UserProvider({ children }) {
             const signinData = Object.fromEntries(new FormData(e.target))
             await axios.post('/api/users/login', signinData)
 
-            const user = await verifyCookie()
-            setUser(user)
+            const userData = await initUser()
+
             setSigninMsg({ msg: '', color: 'inherit' })
-            toast(`👋 Welcome ${user.firstName}!`)
+            toast(`👋 Welcome ${userData.firstName}!`, { theme: userData?.themeMode ? userData.themeMode : 'light' })
             navigate(-1)
 
         } catch (err) {
+            console.log(err)
             if (err.response.status === 403) {
                 setSigninMsg({ msg: 'Incorrect username or password', color: 'error.main' })
             }
-            console.log(err)
         }
     }
 
     async function handleLogout() {
         try {
-            delete axios.defaults.headers.common.Authorization
             await axios.delete('/api/users/logout')
             await initUser()
+            setSavedEvents(null)
+            setSavedVenues(null)
             setSigninMsg({ msg: 'You have been signed out', color: 'success.main' })
             navigate('/signin')
             toast.success('You have been signed out')
@@ -91,8 +106,9 @@ export default function UserProvider({ children }) {
             const signupData = Object.fromEntries(new FormData(e.target))
             signupData.password2 = undefined
             await axios.post('/api/users/new', signupData)
+            setSignupMsg({ msg: '', color: 'inherit' })
             setSigninMsg({ msg: 'Account created! Please sign in', color: 'success.main' })
-            navigate('/signin')
+            navigate('/signin', { replace: true })
 
         } catch (err) {
             if (err.response.status === 409) {
@@ -108,16 +124,28 @@ export default function UserProvider({ children }) {
             handleLogout,
             handleSignup,
             user,
+            initialised,
             signinMsg,
             signupMsg,
             savedVenues,
             savedEvents,
             getSavedEvents,
-            getSavedVenues
+            getSavedVenues,
+            initUser
         }}>
             {children}
         </UserContext.Provider>
     )
+}
+
+export function useIsSiteInitialised() {
+    const { initialised } = useContext(UserContext)
+    return initialised
+}
+
+export function useInitUser() {
+    const { initUser } = useContext(UserContext)
+    return initUser
 }
 
 export function useLoginPage() {
@@ -141,9 +169,9 @@ export function useCurrentUser() {
 }
 
 export function useSavedVenues(venueId = '') {
-    const { savedVenues, getSavedVenues } = useContext(UserContext)
+    const { savedVenues, getSavedVenues, user } = useContext(UserContext)
 
-    if (!savedVenues) getSavedVenues()
+    if (!savedVenues && user) getSavedVenues()
 
     async function saveVenue() {
         try {
@@ -165,13 +193,13 @@ export function useSavedVenues(venueId = '') {
 
     const isVenueSaved = savedVenues?.find(({ _id }) => venueId === _id)
 
-    return { savedVenues, saveVenue, unsaveVenue, isVenueSaved }
+    return { savedVenues, saveVenue, unsaveVenue, isVenueSaved, getSavedVenues }
 }
 
 export function useSavedEvents(eventId = '') {
-    const { savedEvents, getSavedEvents } = useContext(UserContext)
+    const { savedEvents, getSavedEvents, user } = useContext(UserContext)
 
-    if (!savedEvents) getSavedEvents()
+    if (!savedEvents && user) getSavedEvents()
 
     async function saveEvent() {
         try {
@@ -193,5 +221,5 @@ export function useSavedEvents(eventId = '') {
 
     const isEventSaved = savedEvents?.find(({ _id }) => eventId === _id)
 
-    return { savedEvents, saveEvent, unsaveEvent, isEventSaved }
+    return { savedEvents, saveEvent, unsaveEvent, isEventSaved, getSavedEvents }
 }

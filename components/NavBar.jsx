@@ -10,6 +10,10 @@ import SearchIcon from '@mui/icons-material/Search';
 import LoginIcon from '@mui/icons-material/Login';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
+import Autocomplete from '@mui/material/Autocomplete';
+import { debounce } from '@mui/material/utils';
+import parse from 'autosuggest-highlight/parse';
+import match from 'autosuggest-highlight/match';
 
 // AccountDrawer
 import SwipeableDrawer from '@mui/material/SwipeableDrawer';
@@ -26,12 +30,15 @@ import FestivalIcon from '@mui/icons-material/Festival';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Tooltip from '@mui/material/Tooltip';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useCurrentUser, useHandleLogout } from '../context/UserContext';
 import Stack from '@mui/material/Stack';
 import ButtonBase from '@mui/material/ButtonBase';
 import { Link as LinkRouter } from 'react-router-dom';
 import { useIsMobile } from '../hooks/useIsMobile';
+import axios from 'axios';
+import { TextField } from '@mui/material';
+import { StyledLinkRouter } from './StyledLinkRouter';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -73,6 +80,20 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
+function SearchBarBase() {
+    return (
+        <Search sx={{ width: '100%' }}>
+            <SearchIconWrapper>
+                <SearchIcon />
+            </SearchIconWrapper>
+            <StyledInputBase
+                placeholder="Search…"
+                inputProps={{ 'aria-label': 'search' }}
+            />
+        </Search>
+    )
+}
+
 export default function NavBar() {
 
     const user = useCurrentUser()
@@ -82,23 +103,72 @@ export default function NavBar() {
 
     const isMobile = useIsMobile()
 
+    const [value, setValue] = useState()
+    const [inputValue, setInputValue] = useState('')
+    const [searchResults, setSearchResults] = useState([])
+    const searchResultMatchProp = 'name'
+
+    async function getSearchResults(searchQuery) {
+        try {
+            const { data } = await axios.get(`/api/search/${searchQuery}`)
+            setSearchResults(data)
+        } catch (err) {
+            console.log(err.message)
+        }
+    }
+
+    const debouncedGetSearchResults = useMemo(() => debounce((query) => getSearchResults(query), 400), [])
+
     const Logo = (isMobile &&
-        <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-            <Typography variant='h6' fontWeight='bold'>TurnUp</Typography>
-        </Box>
+        <LinkRouter to='/browse' style={{ all: 'unset', cursor: 'pointer' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                <Typography fontFamily='Pacifico' component='h1' fontSize='1.8em' mb={0.8}>TurnUp</Typography>
+            </Box>
+        </LinkRouter>
     )
 
     const SearchBar = (
         <Box sx={{ display: 'flex', alignItems: 'center', flex: 2, justifyContent: 'center' }}>
-            <Search>
-                <SearchIconWrapper>
-                    <SearchIcon />
-                </SearchIconWrapper>
-                <StyledInputBase
-                    placeholder="Search…"
-                    inputProps={{ 'aria-label': 'search' }}
-                />
-            </Search>
+            <Autocomplete
+                sx={{ width: '100%' }}
+                noOptionsText='No results'
+                filterOptions={(x) => x}
+                options={searchResults}
+                getOptionLabel={(option) => option[searchResultMatchProp]}
+                renderInput={(params) => (
+                    <TextField {...params} label="Search" />
+                )}
+                onInputChange={(event, newInputValue) => {
+                    if (!newInputValue) setSearchResults([])
+                    setInputValue(newInputValue)
+                    debouncedGetSearchResults(newInputValue)
+                }}
+                inputValue={inputValue}
+                renderOption={(props, option, { inputValue }) => {
+                    const matches = match(option[searchResultMatchProp], inputValue, { insideWords: true });
+                    const parts = parse(option[searchResultMatchProp], matches);
+                    const type = option.placeId ? 'venues' : 'events'
+
+                    return (
+                        <StyledLinkRouter to={`/${type}/${option._id}`}>
+                            <li {...props}>
+                                <div>
+                                    {parts.map((part, index) => (
+                                        <span
+                                            key={index}
+                                            style={{
+                                                fontWeight: part.highlight ? 700 : 400,
+                                            }}
+                                        >
+                                            {part.text}
+                                        </span>
+                                    ))}
+                                </div>
+                            </li>
+                        </StyledLinkRouter>
+                    );
+                }}
+            />
         </Box>
     )
 
@@ -111,31 +181,18 @@ export default function NavBar() {
                     </IconButton>
                 </Tooltip>
                 :
-                <Box sx={{
-                    py: 0.5,
-                    px: 2,
-                    borderRadius: 2,
-                    transition: 'background 0.1s',
-                    ":hover": {
-                        backgroundColor: '#ffffff40'
-                    }
-                }}>
-                    <ButtonBase LinkComponent={LinkRouter} to='/signin'>
-                        <Stack direction='row' alignItems='center'>
-                            <Typography variant='h6' mr={1} >
-                                Sign in
-                            </Typography>
-                            <LoginIcon fontSize='large' />
-                        </Stack>
-                    </ButtonBase>
-                </Box>
+                <Tooltip title='Sign in'>
+                    <IconButton color='inherit' LinkComponent={LinkRouter} to='/signin'>
+                        <LoginIcon fontSize='large' />
+                    </IconButton>
+                </Tooltip>
             }
         </Box>
     )
 
     return (
         <>
-            <AppBar position="static" sx={{ transition: 'background 0.2s' }}>
+            <AppBar position="static" sx={{ transition: 'background 0.2s', zIndex: 2 }}>
                 <Toolbar sx={{ display: 'flex' }}>
                     {Logo}
                     {SearchBar}
@@ -164,11 +221,7 @@ function AccountDrawer({ isOpen, setIsOpen, user }) {
             icon: <WhereToVoteIcon />
         },
         {
-            label: 'Hosted events',
-            icon: <EventIcon />
-        },
-        {
-            label: 'Owned venues',
+            label: 'Hosting',
             icon: <FestivalIcon />
         },
     ]
@@ -212,7 +265,7 @@ function AccountDrawer({ isOpen, setIsOpen, user }) {
 
     const userItems = userPages.map(({ label, icon }) =>
         <ListItem key={label}>
-            <ListItemButton>
+            <ListItemButton LinkComponent={LinkRouter} to={label.split(' ').join('').toLowerCase()}>
                 <ListItemIcon>
                     {icon}
                 </ListItemIcon>

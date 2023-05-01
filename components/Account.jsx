@@ -7,14 +7,16 @@ import Stack from '@mui/material/Stack'
 import PersonIcon from '@mui/icons-material/Person';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import Button from '@mui/material/Button'
-import { useState } from 'react'
 import axios from 'axios'
-import { useCurrentUser } from '../context/UserContext'
+import { useState } from 'react'
+import { useCurrentUser, useInitUser } from '../context/UserContext'
 import { useImageUpload } from '../hooks/useImageUpload'
+import { toast } from 'react-toastify'
 
 export default function Account() {
 
     const user = useCurrentUser()
+    const initUser = useInitUser()
 
     const { img, handleImgChange } = useImageUpload()
     const [hasChanges, setHasChanges] = useState(false)
@@ -24,16 +26,25 @@ export default function Account() {
         setHasChanges(true)
     }
 
-    async function handleEditSubmit(e) {
-        e.preventDefault()
-        const editData = new FormData(e.target)
-        console.log(editData)
-        try {
-            await axios.put('/api/users/edit', editData)
-            window.location.reload()
-        } catch (err) {
-            console.log(err.message)
+    function handleEditSubmit() {
+        const editData = {
+            data: {
+                irrelevantPropToDefineObject: 'meaningless value'
+            },
+            file: img.data
         }
+        axios.put('/api/users/edit', editData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+            .then(() => {
+                initUser()
+                setHasChanges(false)
+                toast.success('Changes saved')
+            })
+            .catch(err => console.log(err.message))
+
     }
 
     return (
@@ -41,7 +52,7 @@ export default function Account() {
             <Paper sx={{ p: 3, transition: 'background 0.2s' }}>
                 <Stack spacing={3}>
                     <Typography variant='h4' fontWeight='500' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {user?.firstName} {user?.lastName}
+                        {user.firstName} {user?.lastName}
                     </Typography>
                     <Divider />
                     <Stack direction='row' alignItems='center'>
@@ -50,30 +61,28 @@ export default function Account() {
                             Edit profile:
                         </Typography>
                     </Stack>
-                    <Box component='form' onSubmit={handleEditSubmit} sx={{ display: 'flex', justifyContent: 'center' }}>
-                        <Stack>
-                            <Box sx={{
-                                borderColor: 'text.secondary',
-                                borderWidth: '2px',
-                                borderStyle: 'solid',
-                                borderRadius: '8px',
-                                width: '150px',
-                                height: '150px',
-                                mb: 2,
-                                display: 'flex',
-                                alignItems: 'center',
-                                backgroundImage: img.preview ? `url(${img.preview})` : `url(${user?.pfp})`,
-                                backgroundSize: 'cover',
-                                backgroundPosition: 'center'
-                            }}>
-                            </Box>
-                            <Button component="label" endIcon={<PhotoCamera />}>
-                                Change pic
-                                <input hidden name='file' accept="image/*" type="file" onChange={handleChange} />
-                            </Button>
-                            <Button variant='contained' type='submit' disabled={!hasChanges}>Save changes</Button>
-                        </Stack>
-                    </Box>
+                    <Stack alignItems='center'>
+                        <Box sx={{
+                            borderColor: 'text.secondary',
+                            borderWidth: '2px',
+                            borderStyle: 'solid',
+                            borderRadius: '8px',
+                            width: '150px',
+                            height: '150px',
+                            mb: 2,
+                            display: 'flex',
+                            alignItems: 'center',
+                            backgroundImage: img.preview ? `url(${img.preview})` : `url(${user?.pfp})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center'
+                        }}>
+                        </Box>
+                        <Button component="label" endIcon={<PhotoCamera />}>
+                            Change pic
+                            <input hidden name='file' accept="image/*" type="file" onChange={handleChange} />
+                        </Button>
+                        <Button variant='contained' onClick={handleEditSubmit} disabled={!hasChanges}>Save changes</Button>
+                    </Stack>
                 </Stack>
             </Paper>
         </Container >

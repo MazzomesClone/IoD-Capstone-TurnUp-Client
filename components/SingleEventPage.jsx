@@ -6,12 +6,19 @@ import CircularProgress from "@mui/material/CircularProgress";
 import EventIcon from '@mui/icons-material/Event';
 import SendIcon from '@mui/icons-material/Send';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import DeleteIcon from '@mui/icons-material/Delete';
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
+import Avatar from "@mui/material/Avatar";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import TextField from "@mui/material/TextField";
 import axios from "axios";
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
-import { Link as RouterLink, useOutletContext } from 'react-router-dom'
+import { Link as RouterLink, useNavigate, useOutletContext } from 'react-router-dom'
 import { TabPack } from "../constructors/TabPack";
 import { Outlet, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -22,9 +29,18 @@ import SaveIconButton from "./SaveIconButton";
 import SavedUsersAvatarStack from "./SavedUsersAvatarStack";
 import GoogleMap from "./GoogleMap";
 import { useRouteMatch } from "../hooks/useRouteMatch";
-import { Avatar, Divider, IconButton, TextField } from "@mui/material";
 import { getTimeUntilEvent } from "../utils/getTimeUntilEvent";
 import { useFormControl } from "../hooks/useFormControl";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import { toast } from "react-toastify";
+import { StyledLinkRouter } from "./StyledLinkRouter";
 
 function SingleDiscussionCard({ data, currentUserId }) {
 
@@ -99,8 +115,6 @@ function EventDiscussion() {
         if (!discussionData) getDiscussionData()
     }, [])
 
-    console.log(discussionData)
-
     if (error) return (
         <Box sx={{ pt: 3, display: 'flex', justifyContent: 'center' }}>
             <Typography variant='h6'>Something went wrong!</Typography>
@@ -174,6 +188,8 @@ export const EventTabPack = new TabPack(
 
 export default function SingleEventPage() {
 
+    const navigate = useNavigate()
+
     const [eventData, setEventData] = useState({})
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(false)
@@ -187,6 +203,8 @@ export default function SingleEventPage() {
     const isMobile = useIsMobile()
 
     const currentTab = useRouteMatch(EventTabPack)
+
+    const user = useCurrentUser()
 
     function getEventPageData() {
         axios.get(`/api/events/pagedata/${eventId}`)
@@ -206,13 +224,95 @@ export default function SingleEventPage() {
 
     //console.log(eventData)
 
-    const { name, date, primaryImage, description, usersThatSaved, venueId } = eventData
+    const { name, date, endDate, primaryImage, description, usersThatSaved, venueId } = eventData
 
     const { formattedTime, formattedDate } = formatDate(date)
 
+    const userHostsEvent = eventData.venueId?.ownerUserId === user?._id
+
+    /* Host Menu */
+    const [anchorEl, setAnchorEl] = useState(null);
+    const hostMenuOpen = Boolean(anchorEl);
+    const handleMenuOpen = (e) => setAnchorEl(e.currentTarget)
+    const handleMenuClose = () => setAnchorEl(null)
+
+    const HostMenu = (
+        <Menu
+            id="host-menu"
+            anchorEl={anchorEl}
+            open={hostMenuOpen}
+            onClose={handleMenuClose}
+            MenuListProps={{
+                'aria-labelledby': 'host-menu',
+            }}
+            anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+            }}
+            transformOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+            }}
+        >
+            <MenuItem onClick={() => {
+                handleMenuClose()
+                handleCancelDialogOpen()
+            }}>
+                <ListItemIcon>
+                    <DeleteIcon />
+                </ListItemIcon>
+                <ListItemText>
+                    Cancel event
+                </ListItemText>
+            </MenuItem>
+        </Menu>
+    )
+
+    /* Cancel event dialog */
+    const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+    const handleCancelDialogOpen = () => setCancelDialogOpen(true)
+    const handleCancelDialogClose = () => setCancelDialogOpen(false)
+    const { getSavedEvents } = useSavedEvents()
+
+    function handleCancelEvent() {
+        handleCancelDialogClose()
+        axios.delete(`/api/events/delete/${eventData._id}`)
+            .then(() => {
+                toast.success('Event cancelled')
+                getSavedEvents()
+                navigate('/')
+            })
+            .catch((err) => console.log(err))
+    }
+
+    const CancelEventDialog = (
+        <Dialog
+            open={cancelDialogOpen}
+            onClose={handleCancelDialogClose}
+            aria-labelledby="cancel-event-dialog-title"
+            aria-describedby="cancel-event-dialog-description"
+        >
+            <DialogTitle id="cancel-event-dialog-title">
+                {"Cancel this event?"}
+            </DialogTitle>
+            <DialogContent>
+                <DialogContentText id="cancel-event-dialog-description">
+                    This event will be deleted, along with its discussion and updates.
+                    This action cannot be undone.
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleCancelDialogClose} autoFocus>Go back</Button>
+                <Button onClick={handleCancelEvent}>
+                    Cancel event
+                </Button>
+            </DialogActions>
+        </Dialog>
+    )
+
     if (error) return (
         <Box sx={{ pt: 3, display: 'flex', justifyContent: 'center' }}>
-            <Typography variant='h4'>Something went wrong!</Typography>
+            <Typography variant='h4'>This event doesn't exist!</Typography>
         </Box>
     )
 
@@ -225,15 +325,35 @@ export default function SingleEventPage() {
     return (
         <Container maxWidth='md'>
             <Paper sx={{ width: '100%', transition: 'background 0.2s' }}>
-                <Box sx={{
-                    height: '40vw',
-                    maxHeight: '350px',
-                    backgroundImage: `url(${primaryImage})`,
-                    backgroundSize: 'cover',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'center'
-                }} />
-                <Box px={isMobile ? 3 : 1.5} pt={3}>
+                {eventData.primaryImage &&
+                    <Box sx={{
+                        height: '40vw',
+                        maxHeight: '350px',
+                        backgroundImage: `url(${primaryImage})`,
+                        backgroundSize: 'cover',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'center'
+                    }} />
+                }
+                {userHostsEvent &&
+                    <Box sx={{
+                        px: 1,
+                        boxSizing: 'border-box',
+                        bgcolor: '#81d683',
+                    }}>
+                        <Stack direction='row' alignItems='center'>
+                            <IconButton onClick={handleMenuOpen}>
+                                <MoreVertIcon htmlColor="rgba(0, 0, 0, 0.87)" />
+                            </IconButton>
+                            <Typography color='rgba(0, 0, 0, 0.87)'>
+                                You are hosting this event
+                            </Typography>
+                        </Stack>
+                        {HostMenu}
+                        {CancelEventDialog}
+                    </Box>
+                }
+                <Box px={isMobile ? 3 : 1.5} pt={isMobile ? 3 : 1.5}>
                     <Grid container spacing={3}>
                         <Grid item xs={12} md={7}>
 
@@ -275,7 +395,7 @@ export default function SingleEventPage() {
                                         </Typography>
                                     </Stack>
                                     <Typography color='text.secondary'>
-                                        {getTimeUntilEvent(date)}
+                                        {getTimeUntilEvent(date, endDate)}
                                     </Typography>
                                 </Stack>
                             </Stack>
@@ -291,9 +411,11 @@ export default function SingleEventPage() {
                             <Stack>
                                 <Stack direction='row' mb={2}>
                                     <Stack spacing={-0.8}>
-                                        <Typography variant="h6" >
-                                            {venueId.name}
-                                        </Typography>
+                                        <StyledLinkRouter to={`/venues/${venueId._id}`}>
+                                            <Typography variant="h6" >
+                                                {venueId.name}
+                                            </Typography>
+                                        </StyledLinkRouter>
                                         <Typography color='text.secondary'>
                                             {venueId.addressArray[1]}
                                         </Typography>

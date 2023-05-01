@@ -1,4 +1,4 @@
-export function getTimeUntilEvent(date) {
+export function getTimeUntilEvent(date, endDate) {
     const now = new Date();
     const distance = new Date(date) - now;
     const seconds = Math.floor(distance / 1000);
@@ -8,8 +8,10 @@ export function getTimeUntilEvent(date) {
     const weeks = Math.floor(days / 7);
     const months = Math.floor(days / 30);
 
-    if (distance < 0) {
-        return "Already started";
+    if (new Date(endDate) < now) {
+        return "Event finished"
+    } else if (distance < 0) {
+        return "Happening now";
     } else if (seconds < 60) {
         return `Starts in ${seconds} seconds`;
     } else if (minutes < 60) {

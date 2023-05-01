@@ -1,0 +1,2 @@
+const ISO_8601_FORMAT = 'YYYY-MM-DDTHH:mm:ss.SSSZ'
+export default ISO_8601_FORMAT
