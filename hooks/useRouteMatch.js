@@ -6,7 +6,7 @@ export function useRouteMatch(TabPack) {
 
     for (const route of routePathsAndComponents) {
         const match = matchPath(`${pageRoute}/${route.path}`, pathname)
-        if (match != null) return route.path
+        if (match) return route.path
     }
 
     return null

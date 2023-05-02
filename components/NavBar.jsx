@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
 import LoginIcon from '@mui/icons-material/Login';
+import PlaceIcon from '@mui/icons-material/Place';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -34,11 +35,11 @@ import { useMemo, useState } from 'react';
 import { useCurrentUser, useHandleLogout } from '../context/UserContext';
 import Stack from '@mui/material/Stack';
 import ButtonBase from '@mui/material/ButtonBase';
-import { Link as LinkRouter } from 'react-router-dom';
+import { Link as LinkRouter, useNavigate } from 'react-router-dom';
 import { useIsMobile } from '../hooks/useIsMobile';
 import axios from 'axios';
-import { TextField } from '@mui/material';
-import { StyledLinkRouter } from './StyledLinkRouter';
+import Grid from '@mui/material/Grid';
+import { formatDate } from '../utils/formatDate';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -51,7 +52,7 @@ const Search = styled('div')(({ theme }) => ({
     marginLeft: 0,
     width: '100%',
     [theme.breakpoints.up('sm')]: {
-        marginLeft: theme.spacing(1),
+        marginLeft: theme.spacing(3),
         width: 'auto',
     },
 }));
@@ -72,41 +73,29 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
         padding: theme.spacing(1, 1, 1, 0),
         // vertical padding + font size from searchIcon
         paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-        //transition: theme.transitions.create('width'),
+        transition: theme.transitions.create('width'),
         width: '100%',
-        [theme.breakpoints.up('sm')]: {
-            width: '40ch',
+        [theme.breakpoints.up('md')]: {
+            width: '20ch',
         },
     },
 }));
 
-function SearchBarBase() {
-    return (
-        <Search sx={{ width: '100%' }}>
-            <SearchIconWrapper>
-                <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-                placeholder="Search…"
-                inputProps={{ 'aria-label': 'search' }}
-            />
-        </Search>
-    )
-}
-
 export default function NavBar() {
 
     const user = useCurrentUser()
+
+    const navigate = useNavigate()
 
     const [isOpen, setIsOpen] = useState(false)
     const openDrawer = () => setIsOpen(true)
 
     const isMobile = useIsMobile()
 
-    const [value, setValue] = useState()
+    const [value, setValue] = useState(null)
     const [inputValue, setInputValue] = useState('')
     const [searchResults, setSearchResults] = useState([])
-    const searchResultMatchProp = 'name'
+    const searchResultPropToMatch = 'name'
 
     async function getSearchResults(searchQuery) {
         try {
@@ -130,42 +119,68 @@ export default function NavBar() {
     const SearchBar = (
         <Box sx={{ display: 'flex', alignItems: 'center', flex: 2, justifyContent: 'center' }}>
             <Autocomplete
-                sx={{ width: '100%' }}
+                sx={{ width: '100%', maxHeight: '50px' }}
+                clearOnEscape
                 noOptionsText='No results'
-                filterOptions={(x) => x}
                 options={searchResults}
-                getOptionLabel={(option) => option[searchResultMatchProp]}
-                renderInput={(params) => (
-                    <TextField {...params} label="Search" />
-                )}
+                getOptionLabel={(option) => option[searchResultPropToMatch]}
+                renderInput={(params) => {
+                    const { InputLabelProps, InputProps, ...rest } = params
+                    return (
+                        <Search sx={{ width: '100%' }}>
+                            <SearchIconWrapper>
+                                <SearchIcon />
+                            </SearchIconWrapper>
+                            <StyledInputBase
+                                placeholder="Search…"
+                                {...InputLabelProps}
+                                {...InputProps}
+                                {...rest}
+                            />
+                        </Search>
+                    )
+                }}
+                value={value}
+                onChange={(event, newValue) => {
+                    setValue(newValue)
+                    if (newValue === '') setSearchResults([])
+                    const type = newValue.placeId ? 'venues' : 'events'
+                    navigate(`/${type}/${newValue._id}`)
+                }}
                 onInputChange={(event, newInputValue) => {
-                    if (!newInputValue) setSearchResults([])
                     setInputValue(newInputValue)
+                    if (newInputValue === '') return setSearchResults([])
                     debouncedGetSearchResults(newInputValue)
                 }}
                 inputValue={inputValue}
                 renderOption={(props, option, { inputValue }) => {
-                    const matches = match(option[searchResultMatchProp], inputValue, { insideWords: true });
-                    const parts = parse(option[searchResultMatchProp], matches);
+                    const matches = match(option[searchResultPropToMatch], inputValue, { insideWords: true });
+                    const parts = parse(option[searchResultPropToMatch], matches);
                     const type = option.placeId ? 'venues' : 'events'
+                    const { formattedDate } = formatDate(option.date)
 
                     return (
-                        <StyledLinkRouter to={`/${type}/${option._id}`}>
-                            <li {...props}>
-                                <div>
+                        <li {...props}>
+                            <Grid container alignItems="center">
+                                <Grid item sx={{ display: 'flex', width: 44 }}>
+                                    {type === 'venues' ? <PlaceIcon /> : <EventIcon />}
+                                </Grid>
+                                <Grid item sx={{ width: 'calc(100% - 44px)', wordWrap: 'break-word' }}>
                                     {parts.map((part, index) => (
-                                        <span
+                                        <Box
                                             key={index}
-                                            style={{
-                                                fontWeight: part.highlight ? 700 : 400,
-                                            }}
+                                            component="span"
+                                            sx={{ fontWeight: part.highlight ? 'bold' : 'regular' }}
                                         >
                                             {part.text}
-                                        </span>
+                                        </Box>
                                     ))}
-                                </div>
-                            </li>
-                        </StyledLinkRouter>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {type === 'venues' ? option.addressArray[1] : formattedDate}
+                                    </Typography>
+                                </Grid>
+                            </Grid>
+                        </li>
                     );
                 }}
             />

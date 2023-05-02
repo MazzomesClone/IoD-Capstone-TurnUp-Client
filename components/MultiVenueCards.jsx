@@ -43,7 +43,7 @@ function VenueCard({ venueData }) {
                         }} />
                     </Box>
                 </LinkRouter>
-                <Box sx={{ p: 1.5 }}>
+                <Box sx={{ p: 1.5, pb: 2 }}>
 
                     {/* Event name & save */}
                     <Stack direction='row' alignItems='center'>

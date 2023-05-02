@@ -13,6 +13,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from "@mui/material/IconButton";
+import EditLocationAltIcon from '@mui/icons-material/EditLocationAlt';
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
 import Link from '@mui/material/Link'
@@ -37,6 +38,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { toast } from 'react-toastify'
+import { UnstyledLinkRouter } from './StyledLinkRouter'
 
 function VenueDetails() {
 
@@ -142,6 +144,12 @@ export const VenueTabPack = new TabPack(
 )
 
 export default function SingleVenuePage() {
+    const { venueId } = useParams()
+    // Ensure remount when venueId changes
+    return <SingleVenuePageRouted venueId={venueId} key={venueId} />
+}
+
+function SingleVenuePageRouted({ venueId }) {
 
     const navigate = useNavigate()
 
@@ -152,8 +160,6 @@ export default function SingleVenuePage() {
     const [venueEvents, setVenueEvents] = useState(null)
 
     const { isVenueSaved, saveVenue, unsaveVenue } = useSavedVenues(venueData._id)
-    const { venueId } = useParams()
-
     const currentTab = useRouteMatch(VenueTabPack)
 
     const isMobile = useIsMobile()
@@ -176,11 +182,9 @@ export default function SingleVenuePage() {
 
     const { name, primaryImage, usersThatSaved, addressArray } = venueData
 
-    console.log(venueData)
-
     const user = useCurrentUser()
 
-    const userOwnsVenue = venueData.ownerUserId === user._id
+    const userOwnsVenue = venueData.ownerUserId === user?._id
 
     /* Host Menu */
     const [anchorEl, setAnchorEl] = useState(null);
@@ -217,6 +221,16 @@ export default function SingleVenuePage() {
                     Delete venue
                 </ListItemText>
             </MenuItem>
+            <UnstyledLinkRouter to='edit'>
+                <MenuItem>
+                    <ListItemIcon>
+                        <EditLocationAltIcon />
+                    </ListItemIcon>
+                    <ListItemText>
+                        Edit venue
+                    </ListItemText>
+                </MenuItem>
+            </UnstyledLinkRouter>
         </Menu>
     )
 
@@ -251,7 +265,7 @@ export default function SingleVenuePage() {
             </DialogTitle>
             <DialogContent>
                 <DialogContentText id="cancel-event-dialog-description">
-                    This venue will be deleted, along with all data for each
+                    This venue will be deleted, along with each
                     of its hosted events. This action cannot be undone.
                 </DialogContentText>
             </DialogContent>
@@ -285,14 +299,16 @@ export default function SingleVenuePage() {
                 m: 0
             }}>
             <Paper sx={{ width: '100%', transition: 'background 0.2s' }}>
-                <Box sx={{
-                    height: '40vw',
-                    maxHeight: '380px',
-                    backgroundImage: `url(${primaryImage})`,
-                    backgroundSize: 'cover',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'center'
-                }} />
+                {venueData.primaryImage &&
+                    <Box sx={{
+                        height: '40vw',
+                        maxHeight: '380px',
+                        backgroundImage: `url(${primaryImage})`,
+                        backgroundSize: 'cover',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'center'
+                    }} />
+                }
                 {userOwnsVenue &&
                     <Box sx={{
                         px: 1,

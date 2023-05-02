@@ -17,50 +17,10 @@ import axios from 'axios';
 import { useImageUpload } from '../hooks/useImageUpload';
 import { useNavigate } from 'react-router-dom';
 import EventNote from '@mui/icons-material/EventNote';
-import parse from 'autosuggest-highlight/parse';
-import match from 'autosuggest-highlight/match';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
-
-function HighlightedAutoComplete({ options, label, setVenue, venue }) {
-    return (
-        <Autocomplete
-            sx={{ width: '100%' }}
-            noOptionsText='You own no venues'
-            options={options}
-            getOptionLabel={(option) => option[label]}
-            renderInput={(params) => (
-                <TextField {...params} label="Search venue" />
-            )}
-            onChange={(event, value) => {
-                setVenue(value)
-            }}
-            value={venue}
-            renderOption={(props, option, { inputValue }) => {
-                const matches = match(option[label], inputValue, { insideWords: true });
-                const parts = parse(option[label], matches);
-
-                return (
-                    <li {...props}>
-                        <div>
-                            {parts.map((part, index) => (
-                                <span
-                                    key={index}
-                                    style={{
-                                        fontWeight: part.highlight ? 700 : 400,
-                                    }}
-                                >
-                                    {part.text}
-                                </span>
-                            ))}
-                        </div>
-                    </li>
-                );
-            }}
-        />
-    );
-}
+import SelectVenue from './SelectVenue';
 
 export default function CreateEvent() {
 
@@ -132,7 +92,7 @@ export default function CreateEvent() {
                                     <Typography variant='h6' >
                                         Select from your venues:
                                     </Typography>
-                                    <HighlightedAutoComplete venue={venue} setVenue={setVenue} options={ownedVenues} label='name' />
+                                    <SelectVenue venue={venue} setVenue={setVenue} options={ownedVenues} label='name' />
                                     <Box>
                                         {venue &&
                                             venue.addressArray.map(line =>

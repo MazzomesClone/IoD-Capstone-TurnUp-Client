@@ -18,13 +18,14 @@ import Browse, { BrowseTabPack } from "../components/Browse";
 import SavedEvents from "../components/SavedEvents";
 import SavedVenues from "../components/SavedVenues";
 import Hosting from "../components/Hosting";
+import EditEvent from "../components/EditEvent";
+import EditVenue from "../components/EditVenue";
 
 function App() {
 
   const { pageRoute: browseRoute, routePathsAndComponents: BrowseTabComponents } = BrowseTabPack
   const { pageRoute: venueRoute, routePathsAndComponents: VenueTabComponents } = VenueTabPack
   const { pageRoute: eventRoute, routePathsAndComponents: EventTabComponents } = EventTabPack
-
 
   const isDarkMode = useIsDarkMode()
 
@@ -50,9 +51,9 @@ function App() {
               {BrowseTabComponents.map(({ path, component }) => <Route path={path} element={component} key={path} />)}
             </Route>
 
-            <Route path='savedevents' element={<SavedEvents />} />
-            <Route path='savedvenues' element={<SavedVenues />} />
-            <Route path='hosting' element={<Hosting />} />
+            <Route path='savedevents/' element={<RestrictedPage><SavedEvents /></RestrictedPage>} />
+            <Route path='savedvenues/' element={<RestrictedPage><SavedVenues /></RestrictedPage>} />
+            <Route path='hosting/' element={<RestrictedPage><Hosting /></RestrictedPage>} />
 
             <Route path="account/" element={<RestrictedPage><Account /></RestrictedPage>} />
             <Route path="settings/" element={<RestrictedPage><Settings /></RestrictedPage>} />
@@ -65,11 +66,13 @@ function App() {
               <Route index element={<Navigate to={'events'} replace />} />
               {VenueTabComponents.map(({ path, component }) => <Route path={path} element={component} key={path} />)}
             </Route>
+            <Route path="venues/:venueId/edit" element={<EditVenue />} />
 
             <Route path={eventRoute} element={<SingleEventPage />}>
               <Route index element={<Navigate to={'discussion'} replace />} />
               {EventTabComponents.map(({ path, component }) => <Route path={path} element={component} key={path} />)}
             </Route>
+            <Route path="events/:eventId/edit" element={<EditEvent />} />
 
           </Route>
 

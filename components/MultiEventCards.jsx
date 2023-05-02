@@ -12,6 +12,8 @@ import SaveIconButton from './SaveIconButton'
 import { Link as LinkRouter } from 'react-router-dom'
 import { StyledLinkRouter } from './StyledLinkRouter'
 import { useTheme } from '@mui/material'
+import LiveIndicator from './LiveIndicator'
+import { getTimeUntilEvent } from '../utils/getTimeUntilEvent'
 
 function EventCard({ eventData }) {
 
@@ -19,8 +21,9 @@ function EventCard({ eventData }) {
 
     const { isEventSaved, saveEvent, unsaveEvent } = useSavedEvents(eventData._id)
 
-    const { name, date, primaryImage, venueId } = eventData
-
+    const { name, date, endDate, primaryImage, venueId } = eventData
+    const timeUntilEvent = getTimeUntilEvent(date, endDate)
+    const eventHappeningNow = timeUntilEvent === 'Happening now'
     const { formattedTime, formattedDate } = formatDate(date)
 
     return (
@@ -70,9 +73,12 @@ function EventCard({ eventData }) {
                             {venueId.name} - {venueId.addressArray[1]}
                         </Typography>
                     </StyledLinkRouter>
-                    <Typography color='text.secondary'>
-                        {formattedTime} {formattedDate}
-                    </Typography>
+                    <Stack direction='row' alignItems='center'>
+                        {eventHappeningNow && <LiveIndicator />}
+                        <Typography color='text.secondary'>
+                            {formattedTime} {formattedDate}
+                        </Typography>
+                    </Stack>
                 </Box>
             </Paper>
         </Grid>
@@ -83,7 +89,7 @@ export default function MultiEventCards({ eventsData }) {
 
     const isMobile = useIsMobile()
 
-    const EventCards = eventsData.map(event => <EventCard eventData={event} />)
+    const EventCards = eventsData.map((event, index) => <EventCard eventData={event} key={index} />)
 
     if (eventsData.length === 0) return (
         <Typography color='text.secondary' mt={3} textAlign='center'>

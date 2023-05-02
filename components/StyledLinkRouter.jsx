@@ -8,3 +8,8 @@ export const StyledLinkRouter = styled(LinkRouter)(({ theme }) => ({
         textDecoration: 'underline'
     }
 }))
+
+export const UnstyledLinkRouter = styled(LinkRouter)(({ theme }) => ({
+    all: 'unset',
+    cursor: 'pointer'
+}))

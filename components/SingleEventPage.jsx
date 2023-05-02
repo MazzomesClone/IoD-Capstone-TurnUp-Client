@@ -5,6 +5,7 @@ import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import EventIcon from '@mui/icons-material/Event';
 import SendIcon from '@mui/icons-material/Send';
+import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Typography from "@mui/material/Typography";
@@ -40,29 +41,78 @@ import DialogTitle from "@mui/material/DialogTitle";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { toast } from "react-toastify";
-import { StyledLinkRouter } from "./StyledLinkRouter";
+import { StyledLinkRouter, UnstyledLinkRouter } from "./StyledLinkRouter";
+import { MenuList, Tooltip } from "@mui/material";
+import LiveIndicator from "./LiveIndicator";
+import { useImageUpload } from "../hooks/useImageUpload";
 
-function SingleDiscussionCard({ data, currentUserId }) {
+function SingleDiscussionCard({ data, currentUserId, getDiscussionData }) {
 
     const { userId, postBody, createdAt } = data
 
     const { firstName, lastName, pfp } = userId
     const { formattedDate, formattedTime } = formatDate(createdAt)
 
+    /* Post menu */
+    const [anchorEl, setAnchorEl] = useState(null);
+    const hostMenuOpen = Boolean(anchorEl);
+    const handleMenuOpen = (e) => setAnchorEl(e.currentTarget)
+    const handleMenuClose = () => setAnchorEl(null)
+
+    function handleDiscussionDelete() {
+        axios.delete(`/api/events/discussion/delete/${data._id}`)
+            .then(() => getDiscussionData())
+            .catch(err => console.log(err))
+    }
+
+    const HostMenu = (
+        <Menu
+            id="host-menu"
+            anchorEl={anchorEl}
+            open={hostMenuOpen}
+            onClose={handleMenuClose}
+            MenuListProps={{
+                'aria-labelledby': 'host-menu',
+            }}
+            anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+            }}
+            transformOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+            }}
+        >
+            <MenuList dense>
+                <MenuItem onClick={handleDiscussionDelete}>
+                    <ListItemIcon>
+                        <DeleteIcon />
+                    </ListItemIcon>
+                    <ListItemText>
+                        Delete
+                    </ListItemText>
+                </MenuItem>
+            </MenuList>
+        </Menu>
+    )
+
     return (
         <Paper sx={{ p: 1.5 }}>
             <Stack>
                 <Stack direction='row' justifyContent='space-between' alignItems='flex-start' flexWrap='wrap' mb={1}>
                     <Stack direction='row' alignItems='center' flexWrap='wrap'>
-                        {/* {currentUserId === userId._id &&
-                            <IconButton onClick={() => { }} sx={{ ml: 'auto' }}>
-                                <MoreVertIcon />
-                            </IconButton>
-                        } */}
                         <Avatar alt={`${firstName} ${lastName}`} src={pfp} sx={{ width: '1.5em', height: '1.5em' }} />
                         <Typography mt={0.3} ml={1} fontWeight='500' fontSize='1.1em'>
                             {firstName} {lastName}
                         </Typography>
+                        {currentUserId === userId._id &&
+                            <>
+                                <IconButton onClick={handleMenuOpen} sx={{ ml: 'auto' }}>
+                                    <MoreVertIcon />
+                                </IconButton>
+                                {HostMenu}
+                            </>
+                        }
                     </Stack>
                     <Typography color='text.secondary' fontSize='small'>
                         {formattedTime} · {formattedDate}
@@ -79,9 +129,7 @@ function SingleDiscussionCard({ data, currentUserId }) {
 
 function EventDiscussion() {
 
-    const user = useCurrentUser()
-
-    const { eventId, discussionData, setDiscussionData } = useOutletContext()
+    const { eventId, discussionData, setDiscussionData, user } = useOutletContext()
     const [loading, setLoading] = useState(!discussionData)
     const [error, setError] = useState(false)
 
@@ -160,15 +208,89 @@ function EventDiscussion() {
                     </Stack>
                 </Paper>
 
-                {discussionData.map((item, index) => <SingleDiscussionCard data={item} currentUserId={user?._id} key={index} />)}
+                {discussionData.map((item, index) => <SingleDiscussionCard data={item} currentUserId={user?._id} key={index} getDiscussionData={getDiscussionData} />)}
             </Stack>
         </Container>
     )
 }
 
-function EventUpdates() {
+function SingleUpdateCard({ data }) {
     return (
-        <>Updates</>
+        <Paper>
+            <Stack>
+                <Box p={2}>
+
+                </Box>
+                <Box sx={{
+                    maxHeight: '100px',
+                    backgroundImage: `url(${primaryImage})`,
+                    backgroundSize: 'contain',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'center'
+                }} />
+            </Stack>
+        </Paper>
+    )
+}
+
+function EventUpdates() {
+
+    const { ownerUserId, user, updatesData, setUpdatesData } = useOutletContext()
+    const [loading, setLoading] = useState(!updatesData)
+    const [error, setError] = useState(false)
+
+    const { img, handleImgChange, setImg } = useImageUpload()
+    const { inputProps: postInputProps } = useFormControl('')
+
+    const userHostsEvent = ownerUserId === user?._id
+
+    function handlePostSumbit() {
+
+    }
+
+    function getUpdatesData() {
+
+    }
+
+    useEffect(() => {
+        setLoading(false)
+    }, [])
+
+    if (error) return (
+        <Box sx={{ pt: 3, display: 'flex', justifyContent: 'center' }}>
+            <Typography variant='h6'>Something went wrong!</Typography>
+        </Box>
+    )
+
+    if (loading) return (
+        <Box sx={{ pt: 3, display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress />
+        </Box>
+    )
+    return (
+        <Container maxWidth='sm'>
+            <Stack spacing={2} mt={3} mb={2}>
+                {userHostsEvent &&
+                    <Paper>
+                        {img.preview &&
+                            <Box sx={{
+                                maxHeight: '300px',
+                                backgroundImage: img.preview ? `url(${img.preview})` : '',
+                                backgroundSize: 'contain',
+                                backgroundRepeat: 'no-repeat',
+                                backgroundPosition: 'center'
+                            }} />
+                        }
+                        <Box p={1.5}>
+                            <Stack direction='row' alignItems='center'>
+
+                            </Stack>
+                        </Box>
+                    </Paper>
+                }
+                {/* {updatesData.map((update, index) => <SingleUpdateCard data={update} key={index} />)} */}
+            </Stack>
+        </Container>
     )
 }
 
@@ -187,6 +309,13 @@ export const EventTabPack = new TabPack(
 )
 
 export default function SingleEventPage() {
+    const { eventId } = useParams()
+
+    // Ensure remount when eventId changes
+    return <SingleEventPageRouted eventId={eventId} key={eventId} />
+}
+
+function SingleEventPageRouted({ eventId }) {
 
     const navigate = useNavigate()
 
@@ -195,10 +324,9 @@ export default function SingleEventPage() {
     const [error, setError] = useState(false)
 
     const [discussionData, setDiscussionData] = useState(null)
+    const [updatesData, setUpdatesData] = useState(null)
 
     const { isEventSaved, saveEvent, unsaveEvent } = useSavedEvents(eventData._id)
-
-    const { eventId } = useParams()
 
     const isMobile = useIsMobile()
 
@@ -222,11 +350,11 @@ export default function SingleEventPage() {
         getEventPageData()
     }, [isEventSaved])
 
-    //console.log(eventData)
-
     const { name, date, endDate, primaryImage, description, usersThatSaved, venueId } = eventData
 
+    const timeUntilEvent = getTimeUntilEvent(date, endDate)
     const { formattedTime, formattedDate } = formatDate(date)
+    const { formattedTime: formattedEndTime, formattedDate: formattedEndDate } = formatDate(endDate)
 
     const userHostsEvent = eventData.venueId?.ownerUserId === user?._id
 
@@ -254,17 +382,29 @@ export default function SingleEventPage() {
                 horizontal: 'left',
             }}
         >
-            <MenuItem onClick={() => {
-                handleMenuClose()
-                handleCancelDialogOpen()
-            }}>
-                <ListItemIcon>
-                    <DeleteIcon />
-                </ListItemIcon>
-                <ListItemText>
-                    Cancel event
-                </ListItemText>
-            </MenuItem>
+            <MenuList>
+                <MenuItem onClick={() => {
+                    handleMenuClose()
+                    handleCancelDialogOpen()
+                }}>
+                    <ListItemIcon>
+                        <DeleteIcon />
+                    </ListItemIcon>
+                    <ListItemText>
+                        Cancel event
+                    </ListItemText>
+                </MenuItem>
+                <UnstyledLinkRouter to='edit'>
+                    <MenuItem>
+                        <ListItemIcon>
+                            <EditCalendarIcon />
+                        </ListItemIcon>
+                        <ListItemText>
+                            Edit event
+                        </ListItemText>
+                    </MenuItem>
+                </UnstyledLinkRouter>
+            </MenuList>
         </Menu>
     )
 
@@ -361,11 +501,18 @@ export default function SingleEventPage() {
                             <Stack direction='row' alignItems='center' mb={1.5} flexWrap='wrap'>
                                 <Stack direction='row' alignItems='center' width='max-content'>
                                     <EventIcon sx={{ pr: 1, fontSize: '3.2em', transform: 'translateY(0.05em)' }} />
+
                                     <Stack spacing={-1}>
                                         <Stack direction='row' alignItems='center'>
-                                            <Typography fontSize='1.2em'>
-                                                {formattedTime}
-                                            </Typography>
+                                            <Tooltip
+                                                title={`Ends ${formattedEndTime} ${formattedEndDate}`}
+                                                placement="top"
+                                                enterTouchDelay={0}
+                                                leaveTouchDelay={3000}>
+                                                <Typography fontSize='1.2em'>
+                                                    {formattedTime}
+                                                </Typography>
+                                            </Tooltip>
                                             <SaveIconButton
                                                 isSaved={isEventSaved}
                                                 handleSave={saveEvent}
@@ -394,9 +541,12 @@ export default function SingleEventPage() {
                                             {name}
                                         </Typography>
                                     </Stack>
-                                    <Typography color='text.secondary'>
-                                        {getTimeUntilEvent(date, endDate)}
-                                    </Typography>
+                                    <Stack direction='row' alignItems='center'>
+                                        {timeUntilEvent === 'Happening now' && <LiveIndicator />}
+                                        <Typography color='text.secondary'>
+                                            {timeUntilEvent}
+                                        </Typography>
+                                    </Stack>
                                 </Stack>
                             </Stack>
 
@@ -435,7 +585,16 @@ export default function SingleEventPage() {
                     </Tabs>
                 </Box>
             </Paper>
-            <Outlet context={{ eventId: eventData._id, discussionData, setDiscussionData }} />
+            <Outlet
+                context={{
+                    user,
+                    eventId: eventData._id,
+                    ownerUserId: eventData.venueId.ownerUserId,
+                    discussionData,
+                    setDiscussionData,
+                    updatesData,
+                    setUpdatesData
+                }} />
         </Container>
     )
 }

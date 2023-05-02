@@ -13,11 +13,13 @@ export default function EventDateFilter({ eventsData, setFilteredEventsData }) {
     const [date2, setDate2] = useState(dayjs(today.setFullYear(today.getFullYear() + 1)))
 
     useMemo(() => setFilteredEventsData(
-        eventsData.filter(({ date }) => {
-            const time = new Date(date).getTime();
-            const startTime = new Date(date1.format()).getTime()
-            const endTime = new Date(date2.format()).getTime() + 1000 * 60 * 60 * 24    // + 24Hrs for inclusive filter
-            return time >= startTime && time <= endTime;
+        eventsData.filter(({ date, endDate }) => {
+            const currentTime = dayjs(today)
+            const startTime = dayjs(date)
+            const endTime = dayjs(endDate)
+            const startRange = date1.set('hour', currentTime.hour()).set('minute', currentTime.minute())
+            const endRange = date2.set('hour', 23).set('minute', 59)
+            return endTime > startRange && startTime <= endRange
         })
     ), [date1, date2])
 
@@ -30,7 +32,10 @@ export default function EventDateFilter({ eventsData, setFilteredEventsData }) {
                     </Typography>
                     <DatePicker
                         value={date1}
-                        onChange={(value) => setDate1(value)}
+                        onChange={(value) => {
+                            setDate1(value)
+                            if (value > date2) setDate2(value)
+                        }}
                         label='Between this date' />
                     <DatePicker
                         value={date2}

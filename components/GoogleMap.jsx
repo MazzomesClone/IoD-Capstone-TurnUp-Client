@@ -9,13 +9,11 @@ export default function GoogleMap({ placeId, sx = {} }) {
     const isDarkMode = useIsDarkMode()
 
     return (
-        <>
-            <iframe
-                style={{ border: 0, width: '100%', height: '300px', filter: isDarkMode && 'invert(90%)', ...sx }}
-                referrerPolicy="no-referrer-when-downgrade"
-                src={`https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_API_KEY}&q=${qQuery}`}
-                allowFullScreen>
-            </iframe>
-        </>
+        <iframe
+            style={{ border: 0, width: '100%', height: '300px', filter: isDarkMode && 'invert(90%)', ...sx }}
+            referrerPolicy="no-referrer-when-downgrade"
+            src={`https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_API_KEY}&q=${qQuery}`}
+            allowFullScreen>
+        </iframe>
     )
 }

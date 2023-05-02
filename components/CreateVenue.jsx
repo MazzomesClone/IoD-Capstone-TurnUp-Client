@@ -58,6 +58,7 @@ export default function CreateVenue() {
                 name: nameProps.value,
                 email: emailProps.value,
                 phone: phoneProps.value,
+                website: websiteProps.value,
                 description: descriptionProps.value
             },
             file: img.data
@@ -113,6 +114,11 @@ export default function CreateVenue() {
                                                     {line}
                                                 </Typography>
                                             )}
+                                            {!venueExists &&
+                                                <Typography fontStyle='italic' color='text.secondary'>
+                                                    Once created, the location of this venue may not be changed
+                                                </Typography>
+                                            }
                                         </Stack>
                                     }
                                 </Stack>

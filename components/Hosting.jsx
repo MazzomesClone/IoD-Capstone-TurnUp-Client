@@ -8,31 +8,45 @@ import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import PlaceIcon from '@mui/icons-material/Place';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import MultiVenueCards from "./MultiVenueCards";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Button from "@mui/material/Button";
 import { Link as LinkRouter } from 'react-router-dom'
+import IconButton from "@mui/material/IconButton";
+import EventIcon from '@mui/icons-material/Event';
+import MultiEventCards from "./MultiEventCards";
+import EventDateFilter from "./EventDateFilter";
 
 export default function Hosting() {
 
-    const [loading, setLoading] = useState(true)
+    const [venuesLoading, setVenuesLoading] = useState(true)
     const [venuesData, setVenuesData] = useState(null)
+
+    const [eventsLoading, setEventsLoading] = useState(true)
+    const [eventsData, setEventsData] = useState(null)
+    const [filteredEventsData, setFilteredEventsData] = useState(null)
+
+    const [eventsOpen, setEventsOpen] = useState(true)
+    const [venuesOpen, setVenuesOpen] = useState(false)
 
     useEffect(() => {
         axios.get('/api/venues/owned')
             .then(({ data }) => {
                 setVenuesData(data)
-                setLoading(false)
+                setVenuesLoading(false)
+            })
+            .catch(err => console.log(err.message))
+
+        axios.get('/api/events/userhosted')
+            .then(({ data }) => {
+                setEventsData(data)
+                setEventsLoading(false)
             })
             .catch(err => console.log(err.message))
     }, [])
-
-    if (loading) return (
-        <Box sx={{ pt: 3, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress />
-        </Box>
-    )
 
     return (
         <Container maxWidth='lg' sx={{ pt: 3 }}>
@@ -41,7 +55,7 @@ export default function Hosting() {
                     <Stack direction='row' alignItems='center'>
                         <AddCircleIcon />
                         <Typography variant="h5" ml={1}>
-                            Create:
+                            Create
                         </Typography>
                     </Stack>
                     <Stack direction='row' spacing={2}>
@@ -54,6 +68,36 @@ export default function Hosting() {
                     </Stack>
                 </Stack>
             </Paper>
+
+            {/* Hosted Events */}
+            <Paper sx={{ p: 3, mt: 3, transition: 'background 0.2s' }}>
+                <Stack direction='row' justifyContent='space-between' flexWrap='wrap'>
+                    <Stack direction='row' alignItems='center'>
+                        <EventIcon />
+                        <Typography variant="h5" ml={1}>
+                            Hosted events
+                        </Typography>
+                        <IconButton onClick={() => setEventsOpen(!eventsOpen)}>
+                            {eventsOpen ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+                        </IconButton>
+                    </Stack>
+                </Stack>
+            </Paper>
+            {eventsLoading ?
+                <Box sx={{ pt: 3, display: 'flex', justifyContent: 'center' }}>
+                    <CircularProgress />
+                </Box>
+                : <>
+                    {eventsOpen &&
+                        <>
+                            <EventDateFilter eventsData={eventsData} setFilteredEventsData={setFilteredEventsData} />
+                            <MultiEventCards eventsData={filteredEventsData} />
+                        </>
+                    }
+                </>
+            }
+
+            {/* Owned venues */}
             <Paper sx={{ p: 3, mt: 3, transition: 'background 0.2s' }}>
                 <Stack direction='row' justifyContent='space-between' flexWrap='wrap'>
                     <Stack direction='row' alignItems='center'>
@@ -61,10 +105,22 @@ export default function Hosting() {
                         <Typography variant="h5" ml={1}>
                             Owned venues
                         </Typography>
+                        <IconButton onClick={() => setVenuesOpen(!venuesOpen)}>
+                            {venuesOpen ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+                        </IconButton>
                     </Stack>
                 </Stack>
             </Paper>
-            <MultiVenueCards venuesData={venuesData} />
+            {venuesLoading ?
+                <Box sx={{ pt: 3, display: 'flex', justifyContent: 'center' }}>
+                    <CircularProgress />
+                </Box>
+                : <>
+                    {venuesOpen &&
+                        <MultiVenueCards venuesData={venuesData} />
+                    }
+                </>
+            }
         </Container>
     )
 }

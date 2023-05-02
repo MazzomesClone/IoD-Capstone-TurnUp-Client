@@ -113,9 +113,9 @@ export default function Browse() {
             <Paper sx={{ p: 3, transition: 'background 0.2s' }}>
                 <Stack direction='row' justifyContent='space-between' flexWrap='wrap'>
                     <Stack direction='row' alignItems='center'>
-                        {/* <LibraryBooksIcon /> */}
-                        <Typography fontFamily='Pacifico' variant="h4" ml={1}>
-                            Browse TurnUp
+                        <LibraryBooksIcon />
+                        <Typography /* fontFamily='Pacifico' */ variant="h5" ml={1}>
+                            Discover
                         </Typography>
                     </Stack>
 
