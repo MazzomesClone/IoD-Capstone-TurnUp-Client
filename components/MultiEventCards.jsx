@@ -89,9 +89,9 @@ export default function MultiEventCards({ eventsData }) {
 
     const isMobile = useIsMobile()
 
-    const EventCards = eventsData.map((event, index) => <EventCard eventData={event} key={index} />)
+    const EventCards = eventsData?.map((event, index) => <EventCard eventData={event} key={index} />)
 
-    if (eventsData.length === 0) return (
+    if (eventsData?.length === 0) return (
         <Typography color='text.secondary' mt={3} textAlign='center'>
             No events
         </Typography>

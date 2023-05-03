@@ -63,11 +63,12 @@ export default function EditEvent() {
         }
     }
 
-    console.log(eventData)
-
     useEffect(() => {
         getEventEditData()
             .then(({ eventData, ownedVenues }) => {
+                if (eventData.venueId.ownerUserId !== user._id) {
+                    navigate(`/events/${eventId}`, { replace: true })
+                }
                 loadExistingEventData(eventData, ownedVenues)
                 setLoading(false)
             })

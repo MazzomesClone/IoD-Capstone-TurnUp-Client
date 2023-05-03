@@ -9,6 +9,7 @@ import Button from '@mui/material/Button';
 import { ToggleThemeButton, useIsDarkMode } from '../theme/ThemeProvider'
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import Box from '@mui/material/Box';
 
 export default function Settings() {
 
@@ -32,11 +33,16 @@ export default function Settings() {
     return (
         <Container maxWidth='md' sx={{ pt: 3 }}>
             <Paper sx={{ p: 3, transition: 'background 0.2s' }}>
-                <Stack spacing={3} alignItems='flex-start'>
-                    <Typography variant='h4' fontWeight='500' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <SettingsIcon fontSize='inherit' sx={{ pr: 1 }} />
-                        Settings
-                    </Typography>
+                <Stack spacing={3} /* alignItems='flex-start' */>
+                    <Stack direction='row' alignItems='center' justifyContent='center'>
+
+                        <SettingsIcon sx={{ fontSize: '2em' }} />
+                        <Typography variant='h4'>
+
+                            Settings
+                        </Typography>
+
+                    </Stack>
                     <Divider />
                     <Stack direction='row' alignItems='center'>
                         <DarkModeIcon />
@@ -45,9 +51,11 @@ export default function Settings() {
                         </Typography>
                         <ToggleThemeButton />
                     </Stack>
-                    <Button variant='contained' onClick={handleSubmit}>
-                        Save settings
-                    </Button>
+                    <Box sx={{ width: '250px', display: 'flex', justifyContent: 'center' }} alignSelf='center' justifyContent='center'>
+                        <Button variant='contained' onClick={handleSubmit}>
+                            Save settings
+                        </Button>
+                    </Box>
                 </Stack>
             </Paper>
         </Container >

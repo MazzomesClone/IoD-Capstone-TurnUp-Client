@@ -10,7 +10,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import LoginIcon from '@mui/icons-material/Login';
 import PlaceIcon from '@mui/icons-material/Place';
 import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
+import { UnstyledLinkRouter } from './StyledLinkRouter'
 import Autocomplete from '@mui/material/Autocomplete';
 import { debounce } from '@mui/material/utils';
 import parse from 'autosuggest-highlight/parse';
@@ -108,16 +108,16 @@ export default function NavBar() {
 
     const debouncedGetSearchResults = useMemo(() => debounce((query) => getSearchResults(query), 400), [])
 
-    const Logo = (isMobile &&
-        <LinkRouter to='/browse' style={{ all: 'unset', cursor: 'pointer' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-                <Typography fontFamily='Pacifico' component='h1' fontSize='1.8em' mb={0.8}>TurnUp</Typography>
-            </Box>
-        </LinkRouter>
+    const Logo = (
+        <Box sx={{ display: 'flex', alignItems: 'center', flex: isMobile ? 1 : 0, pr: 2 }}>
+            <UnstyledLinkRouter to='/browse'>
+                <Typography fontFamily='Pacifico' component='h1' fontSize={isMobile ? '1.8em' : '1.5em'} mb={0.8}>{isMobile ? 'TurnUp' : 'T'}</Typography>
+            </UnstyledLinkRouter>
+        </Box>
     )
 
     const SearchBar = (
-        <Box sx={{ display: 'flex', alignItems: 'center', flex: 2, justifyContent: 'center' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', flex: 2.5, justifyContent: 'center' }}>
             <Autocomplete
                 sx={{ width: '100%', maxHeight: '50px' }}
                 clearOnEscape
@@ -188,7 +188,7 @@ export default function NavBar() {
     )
 
     const ProfilePic = (
-        <Box sx={{ display: 'flex', alignItems: 'center', flex: (isMobile) && 1, justifyContent: 'flex-end' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', flex: isMobile ? 1 : 0, justifyContent: 'flex-end' }}>
             {user ?
                 <Tooltip title='Menu'>
                     <IconButton color='inherit' onClick={user && openDrawer}>

@@ -6,3 +6,5 @@ export function useIsMobile() {
     const isMobile = useMediaQuery(theme.breakpoints.up('sm'))
     return isMobile
 }
+
+// isMobile is false when mobile and true when not - whoops!

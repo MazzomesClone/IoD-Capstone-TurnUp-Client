@@ -28,6 +28,7 @@ import { useIsMobile } from "../hooks/useIsMobile";
 import { formatDate } from "../utils/formatDate";
 import SaveIconButton from "./SaveIconButton";
 import SavedUsersAvatarStack from "./SavedUsersAvatarStack";
+import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import GoogleMap from "./GoogleMap";
 import { useRouteMatch } from "../hooks/useRouteMatch";
 import { getTimeUntilEvent } from "../utils/getTimeUntilEvent";
@@ -55,7 +56,7 @@ function SingleDiscussionCard({ data, currentUserId, getDiscussionData }) {
 
     /* Post menu */
     const [anchorEl, setAnchorEl] = useState(null);
-    const hostMenuOpen = Boolean(anchorEl);
+    const postMenuOpen = Boolean(anchorEl);
     const handleMenuOpen = (e) => setAnchorEl(e.currentTarget)
     const handleMenuClose = () => setAnchorEl(null)
 
@@ -65,11 +66,11 @@ function SingleDiscussionCard({ data, currentUserId, getDiscussionData }) {
             .catch(err => console.log(err))
     }
 
-    const HostMenu = (
+    const PostMenu = (
         <Menu
             id="host-menu"
             anchorEl={anchorEl}
-            open={hostMenuOpen}
+            open={postMenuOpen}
             onClose={handleMenuClose}
             MenuListProps={{
                 'aria-labelledby': 'host-menu',
@@ -107,10 +108,10 @@ function SingleDiscussionCard({ data, currentUserId, getDiscussionData }) {
                         </Typography>
                         {currentUserId === userId._id &&
                             <>
-                                <IconButton onClick={handleMenuOpen} sx={{ ml: 'auto' }}>
+                                <IconButton onClick={handleMenuOpen}>
                                     <MoreVertIcon />
                                 </IconButton>
-                                {HostMenu}
+                                {PostMenu}
                             </>
                         }
                     </Stack>
@@ -214,20 +215,85 @@ function EventDiscussion() {
     )
 }
 
-function SingleUpdateCard({ data }) {
+function SingleUpdateCard({ data, userHostsEvent, getUpdatesData }) {
+
+    const { primaryImage, postBody, createdAt } = data
+
+    const { formattedDate, formattedTime } = formatDate(createdAt)
+
+    console.log(data)
+
+    /* Post menu */
+    const [anchorEl, setAnchorEl] = useState(null);
+    const updateMenuOpen = Boolean(anchorEl);
+    const handleMenuOpen = (e) => setAnchorEl(e.currentTarget)
+    const handleMenuClose = () => setAnchorEl(null)
+
+    function handleUpdateDelete() {
+        axios.delete(`/api/events/updates/delete/${data._id}`)
+            .then(() => {
+                toast.success('Update deleted')
+                getUpdatesData()
+            })
+            .catch(err => console.log(err))
+    }
+
+    const UpdateMenu = (
+        <Menu
+            id="host-menu"
+            anchorEl={anchorEl}
+            open={updateMenuOpen}
+            onClose={handleMenuClose}
+            MenuListProps={{
+                'aria-labelledby': 'host-menu',
+            }}
+            anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+            }}
+            transformOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+            }}
+        >
+            <MenuList dense>
+                <MenuItem onClick={handleUpdateDelete}>
+                    <ListItemIcon>
+                        <DeleteIcon />
+                    </ListItemIcon>
+                    <ListItemText>
+                        Delete
+                    </ListItemText>
+                </MenuItem>
+            </MenuList>
+        </Menu>
+    )
+
     return (
         <Paper>
             <Stack>
-                <Box p={2}>
-
+                {primaryImage &&
+                    <img src={primaryImage} alt="Update image" />
+                }
+                <Stack px={1.5} height='40px' direction='row' alignItems='center'>
+                    <Typography color='text.secondary' fontSize='small'>
+                        {formattedTime} {formattedDate}
+                    </Typography>
+                    {userHostsEvent &&
+                        <>
+                            <IconButton onClick={handleMenuOpen}>
+                                <MoreVertIcon />
+                            </IconButton>
+                            {UpdateMenu}
+                        </>
+                    }
+                </Stack>
+                {/* <Divider /> */}
+                <Box px={1.5} pb={1.5}>
+                    <Typography>
+                        {postBody}
+                    </Typography>
                 </Box>
-                <Box sx={{
-                    maxHeight: '100px',
-                    backgroundImage: `url(${primaryImage})`,
-                    backgroundSize: 'contain',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'center'
-                }} />
             </Stack>
         </Paper>
     )
@@ -235,25 +301,50 @@ function SingleUpdateCard({ data }) {
 
 function EventUpdates() {
 
-    const { ownerUserId, user, updatesData, setUpdatesData } = useOutletContext()
+    const { ownerUserId, user, updatesData, setUpdatesData, eventId } = useOutletContext()
     const [loading, setLoading] = useState(!updatesData)
     const [error, setError] = useState(false)
 
     const { img, handleImgChange, setImg } = useImageUpload()
-    const { inputProps: postInputProps } = useFormControl('')
+    const { inputProps: postProps } = useFormControl('')
 
     const userHostsEvent = ownerUserId === user?._id
 
-    function handlePostSumbit() {
+    function handleImgRemove() {
+        setImg({ preview: '', data: '' })
+    }
 
+    function handlePostSumbit() {
+        const updateData = {
+            data: {
+                postBody: postProps.value
+            },
+            file: img.data
+        }
+
+        axios.post(`/api/events/updates/new/${eventId}`, updateData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+            .then(() => {
+                getUpdatesData()
+                toast.success('Update posted!')
+            })
+            .catch(err => console.log(err))
     }
 
     function getUpdatesData() {
-
+        axios.get(`/api/events/updates/${eventId}`)
+            .then(({ data }) => {
+                setUpdatesData(data)
+                setLoading(false)
+            })
+            .catch(err => console.log(error))
     }
 
     useEffect(() => {
-        setLoading(false)
+        if (!updatesData) getUpdatesData()
     }, [])
 
     if (error) return (
@@ -267,28 +358,54 @@ function EventUpdates() {
             <CircularProgress />
         </Box>
     )
+
     return (
         <Container maxWidth='sm'>
             <Stack spacing={2} mt={3} mb={2}>
                 {userHostsEvent &&
                     <Paper>
                         {img.preview &&
-                            <Box sx={{
-                                maxHeight: '300px',
-                                backgroundImage: img.preview ? `url(${img.preview})` : '',
-                                backgroundSize: 'contain',
-                                backgroundRepeat: 'no-repeat',
-                                backgroundPosition: 'center'
-                            }} />
+                            <>
+                                <img src={img.preview} alt="Update image" width='100%' />
+                            </>
                         }
                         <Box p={1.5}>
-                            <Stack direction='row' alignItems='center'>
+                            <Stack direction='row' justifyContent='center'>
+                                <Button component="label" endIcon={<PhotoCamera />}>
+                                    {img.preview ? 'Change image' : 'Add image'}
+                                    <input hidden name='file' accept="image/*" type="file" onChange={handleImgChange} />
+                                </Button>
+                                {img.preview &&
+                                    <Button component="label" endIcon={<DeleteIcon />} onClick={handleImgRemove}>
+                                        Clear image
+                                    </Button>
+                                }
+                            </Stack>
+                            <Stack direction='row' spacing={1}>
+                                <TextField fullWidth
+                                    multiline
+                                    variant="standard"
+                                    disabled={!user}
+                                    {...postProps}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                            e.preventDefault();
+                                            handlePostSumbit();
+                                        }
+                                    }}
+                                    placeholder={'Update your event'}
+                                />
+                                <IconButton sx={{ color: 'primary.main', alignSelf: 'flex-end' }} disabled={!postProps.value} onClick={handlePostSumbit}>
+                                    <SendIcon />
+                                </IconButton>
 
                             </Stack>
                         </Box>
                     </Paper>
                 }
-                {/* {updatesData.map((update, index) => <SingleUpdateCard data={update} key={index} />)} */}
+                {updatesData.map((update, index) =>
+                    <SingleUpdateCard data={update} key={index} userHostsEvent={userHostsEvent} getUpdatesData={getUpdatesData} />
+                )}
             </Stack>
         </Container>
     )

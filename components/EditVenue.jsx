@@ -11,12 +11,14 @@ import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore
 import Typography from '@mui/material/Typography'
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useCurrentUser } from "../context/UserContext";
 
 export default function EditVenue() {
     const navigate = useNavigate()
     const goBack = () => navigate(-1, { replace: true })
 
     const isMobile = useIsMobile()
+    const user = useCurrentUser()
 
     const [venueData, setVenueData] = useState({})
     const [loading, setLoading] = useState(true)
@@ -56,6 +58,9 @@ export default function EditVenue() {
     useEffect(() => {
         getVenueEditData()
             .then((venueData) => {
+                if (venueData.ownerUserId !== user._id) {
+                    navigate(`/venues/${venueId}`, { replace: true })
+                }
                 loadExistingVenueData(venueData)
                 setLoading(false)
             })
