@@ -306,7 +306,7 @@ function EventUpdates() {
     const [error, setError] = useState(false)
 
     const { img, handleImgChange, setImg } = useImageUpload()
-    const { inputProps: postProps } = useFormControl('')
+    const { inputProps: postProps, setValue: setPostValue } = useFormControl('')
 
     const userHostsEvent = ownerUserId === user?._id
 
@@ -328,6 +328,8 @@ function EventUpdates() {
             }
         })
             .then(() => {
+                setPostValue('')
+                handleImgRemove()
                 getUpdatesData()
                 toast.success('Update posted!')
             })
@@ -403,9 +405,17 @@ function EventUpdates() {
                         </Box>
                     </Paper>
                 }
-                {updatesData.map((update, index) =>
-                    <SingleUpdateCard data={update} key={index} userHostsEvent={userHostsEvent} getUpdatesData={getUpdatesData} />
-                )}
+                {updatesData?.length === 0 ?
+                    <Typography color='text.secondary' mt={2} textAlign='center'>
+                        No updates
+                    </Typography>
+                    :
+                    <>
+                        {updatesData.map((update, index) =>
+                            <SingleUpdateCard data={update} key={index} userHostsEvent={userHostsEvent} getUpdatesData={getUpdatesData} />
+                        )}
+                    </>
+                }
             </Stack>
         </Container>
     )

@@ -111,7 +111,7 @@ export default function NavBar() {
     const Logo = (
         <Box sx={{ display: 'flex', alignItems: 'center', flex: isMobile ? 1 : 0, pr: 2 }}>
             <UnstyledLinkRouter to='/browse'>
-                <Typography fontFamily='Pacifico' component='h1' fontSize={isMobile ? '1.8em' : '1.5em'} mb={0.8}>{isMobile ? 'TurnUp' : 'T'}</Typography>
+                <Typography fontFamily='Pacifico' component='h1' fontSize='1.8em' mb={0.8}>{isMobile ? 'TurnUp' : 'T'}</Typography>
             </UnstyledLinkRouter>
         </Box>
     )
@@ -119,7 +119,7 @@ export default function NavBar() {
     const SearchBar = (
         <Box sx={{ display: 'flex', alignItems: 'center', flex: 2.5, justifyContent: 'center' }}>
             <Autocomplete
-                sx={{ width: '100%', maxHeight: '50px' }}
+                sx={{ width: '100%', maxHeight: '50px', maxWidth: '700px' }}
                 clearOnEscape
                 noOptionsText='No results'
                 options={searchResults}
