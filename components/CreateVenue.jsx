@@ -89,7 +89,7 @@ export default function CreateVenue() {
                         <Divider />
                         <Grid container>
                             <Grid item xs={12} sm={6} pr={2}>
-                                <Stack spacing={2}>
+                                <Stack spacing={1.4}>
                                     <Typography variant='h6' >
                                         Search for a location:
                                     </Typography>
@@ -123,7 +123,7 @@ export default function CreateVenue() {
                                     }
                                 </Stack>
                             </Grid>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={6} display='flex' alignItems='center'>
                                 <GoogleMap placeId={locationResult?.placeId} />
                             </Grid>
                         </Grid>

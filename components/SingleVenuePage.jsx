@@ -39,6 +39,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { toast } from 'react-toastify'
 import { UnstyledLinkRouter } from './StyledLinkRouter'
+import useImageDialog from './ImageDialog'
 
 function VenueDetails() {
 
@@ -197,6 +198,8 @@ function SingleVenuePageRouted({ venueId }) {
 
     const userOwnsVenue = venueData.ownerUserId === user?._id
 
+    const { ImageDialog, handleImageDialogOpen } = useImageDialog()
+
     /* Host Menu */
     const [anchorEl, setAnchorEl] = useState(null);
     const hostMenuOpen = Boolean(anchorEl);
@@ -311,14 +314,20 @@ function SingleVenuePageRouted({ venueId }) {
             }}>
             <Paper sx={{ width: '100%', transition: 'background 0.2s' }}>
                 {venueData.primaryImage &&
-                    <Box sx={{
-                        height: '40vw',
-                        maxHeight: '380px',
-                        backgroundImage: `url(${primaryImage})`,
-                        backgroundSize: 'cover',
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'center'
-                    }} />
+                    <>
+                        <Box sx={{
+                            height: '40vw',
+                            maxHeight: '380px',
+                            backgroundImage: `url(${primaryImage})`,
+                            backgroundSize: 'cover',
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'center',
+                            cursor: 'pointer'
+                        }}
+                            onClick={handleImageDialogOpen}
+                        />
+                        <ImageDialog image={primaryImage} />
+                    </>
                 }
                 {userOwnsVenue &&
                     <Box sx={{

@@ -47,7 +47,7 @@ function BrowseEvents() {
 
     return (
         <>
-            <EventDateFilter eventsData={eventsData} setFilteredEventsData={setFilteredEventsData} />
+            <EventDateFilter minDateNow={true} eventsData={eventsData} setFilteredEventsData={setFilteredEventsData} />
             <MultiEventCards eventsData={filteredEventsData} />
         </>
     )

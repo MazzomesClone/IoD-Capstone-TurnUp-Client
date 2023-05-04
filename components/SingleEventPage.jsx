@@ -46,6 +46,7 @@ import { StyledLinkRouter, UnstyledLinkRouter } from "./StyledLinkRouter";
 import { MenuList, Tooltip } from "@mui/material";
 import LiveIndicator from "./LiveIndicator";
 import { useImageUpload } from "../hooks/useImageUpload";
+import useImageDialog from "./ImageDialog";
 
 function SingleDiscussionCard({ data, currentUserId, getDiscussionData }) {
 
@@ -221,7 +222,7 @@ function SingleUpdateCard({ data, userHostsEvent, getUpdatesData }) {
 
     const { formattedDate, formattedTime } = formatDate(createdAt)
 
-    console.log(data)
+    const { ImageDialog, handleImageDialogOpen } = useImageDialog()
 
     /* Post menu */
     const [anchorEl, setAnchorEl] = useState(null);
@@ -273,7 +274,10 @@ function SingleUpdateCard({ data, userHostsEvent, getUpdatesData }) {
         <Paper>
             <Stack>
                 {primaryImage &&
-                    <img src={primaryImage} alt="Update image" />
+                    <>
+                        <img style={{ cursor: 'pointer' }} src={primaryImage} alt="Update image" onClick={handleImageDialogOpen} />
+                        <ImageDialog image={primaryImage} />
+                    </>
                 }
                 <Stack px={1.5} height='40px' direction='row' alignItems='center'>
                     <Typography color='text.secondary' fontSize='small'>
@@ -351,6 +355,7 @@ function EventUpdates() {
     useEffect(() => {
         if (!updatesData) getUpdatesData()
     }, [])
+
 
     if (error) return (
         <Box sx={{ pt: 3, display: 'flex', justifyContent: 'center' }}>
@@ -461,7 +466,7 @@ function SingleEventPageRouted({ eventId }) {
     const isMobile = useIsMobile()
 
     const currentTab = useRouteMatch(EventTabPack)
-
+    const { getSavedEvents } = useSavedEvents()
     const user = useCurrentUser()
 
     function getEventPageData() {
@@ -487,6 +492,8 @@ function SingleEventPageRouted({ eventId }) {
     const { formattedTime: formattedEndTime, formattedDate: formattedEndDate } = formatDate(endDate)
 
     const userHostsEvent = eventData.venueId?.ownerUserId === user?._id
+
+    const { ImageDialog, handleImageDialogOpen } = useImageDialog()
 
     /* Host Menu */
     const [anchorEl, setAnchorEl] = useState(null);
@@ -542,7 +549,6 @@ function SingleEventPageRouted({ eventId }) {
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
     const handleCancelDialogOpen = () => setCancelDialogOpen(true)
     const handleCancelDialogClose = () => setCancelDialogOpen(false)
-    const { getSavedEvents } = useSavedEvents()
 
     function handleCancelEvent() {
         handleCancelDialogClose()
@@ -596,14 +602,20 @@ function SingleEventPageRouted({ eventId }) {
         <Container maxWidth='md'>
             <Paper sx={{ width: '100%', transition: 'background 0.2s' }}>
                 {eventData.primaryImage &&
-                    <Box sx={{
-                        height: '40vw',
-                        maxHeight: '350px',
-                        backgroundImage: `url(${primaryImage})`,
-                        backgroundSize: 'cover',
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'center'
-                    }} />
+                    <>
+                        <Box sx={{
+                            height: '40vw',
+                            maxHeight: '350px',
+                            backgroundImage: `url(${primaryImage})`,
+                            backgroundSize: 'cover',
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'center',
+                            cursor: 'pointer'
+                        }}
+                            onClick={handleImageDialogOpen}
+                        />
+                        <ImageDialog image={primaryImage} />
+                    </>
                 }
                 {userHostsEvent &&
                     <Box sx={{

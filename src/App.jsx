@@ -90,6 +90,7 @@ function App() {
         hideProgressBar
         theme={isDarkMode ? 'dark' : 'light'}
         pauseOnFocusLoss={false}
+        limit={3}
       />
     </UserProvider>
   )

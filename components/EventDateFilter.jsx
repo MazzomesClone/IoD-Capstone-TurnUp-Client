@@ -5,7 +5,7 @@ import { DatePicker } from '@mui/x-date-pickers'
 import dayjs from 'dayjs'
 import { useMemo, useState } from 'react'
 
-export default function EventDateFilter({ eventsData, setFilteredEventsData }) {
+export default function EventDateFilter({ eventsData, setFilteredEventsData, minDateNow = false }) {
 
     const today = new Date()
 
@@ -32,6 +32,7 @@ export default function EventDateFilter({ eventsData, setFilteredEventsData }) {
                     </Typography>
                     <DatePicker
                         value={date1}
+                        minDate={minDateNow ? dayjs(new Date()) : undefined}
                         onChange={(value) => {
                             setDate1(value)
                             if (value > date2) setDate2(value)
