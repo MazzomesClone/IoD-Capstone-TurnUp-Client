@@ -20,6 +20,7 @@ import SavedVenues from "../components/SavedVenues";
 import Hosting from "../components/Hosting";
 import EditEvent from "../components/EditEvent";
 import EditVenue from "../components/EditVenue";
+import PageNotFound from "../components/PageNotFound";
 
 function App() {
 
@@ -74,6 +75,7 @@ function App() {
             </Route>
             <Route path="events/:eventId/edit" element={<EditEvent />} />
 
+            <Route path="*" element={<PageNotFound />} />
           </Route>
 
           <Route path="/signin/" element={<Signin />} />

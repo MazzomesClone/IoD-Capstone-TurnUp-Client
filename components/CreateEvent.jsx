@@ -1,4 +1,3 @@
-import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
@@ -31,13 +30,15 @@ export default function CreateEvent() {
     const [ownedVenues, setOwnedVenues] = useState([])
     const [venue, setVenue] = useState(null)
 
+    const now = dayjs(new Date())
+
     const { inputProps: nameProps } = useFormControl('')
     const { inputProps: descriptionProps } = useFormControl('')
-    const [date, setDate] = useState(dayjs(new Date()))
-    const [endDate, setEndDate] = useState(dayjs(new Date()))
+    const [date, setDate] = useState(now.add(1, 'minute'))
+    const [endDate, setEndDate] = useState(now.add(1, 'minute').add(1, 'hour'))
     const { img, handleImgChange, setImg } = useImageUpload()
 
-    const isEndDateInvalid = endDate.format() < date.format()
+    const isEndDateInvalid = endDate.format() < date.format() || date < now
 
     useEffect(() => {
         axios.get('/api/venues/owned')
@@ -50,7 +51,6 @@ export default function CreateEvent() {
     }
 
     function handleSubmit() {
-
         const newEventData = {
             data: {
                 venueId: venue._id,
@@ -61,7 +61,6 @@ export default function CreateEvent() {
             },
             file: img.data
         }
-
         axios.post('/api/events/new', newEventData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
@@ -144,10 +143,11 @@ export default function CreateEvent() {
                                             </Typography>
                                             <DateTimePicker
                                                 ampm
+                                                minDateTime={now}
                                                 value={date}
                                                 onChange={(value) => {
                                                     setDate(value)
-                                                    setEndDate(value)
+                                                    if (value > endDate) setEndDate(value)
                                                 }}
                                             />
                                         </Stack>

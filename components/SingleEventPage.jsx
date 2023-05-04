@@ -315,13 +315,13 @@ function EventUpdates() {
     }
 
     function handlePostSumbit() {
+        if (!postProps.value && !img.data) return
         const updateData = {
             data: {
                 postBody: postProps.value
             },
             file: img.data
         }
-
         axios.post(`/api/events/updates/new/${eventId}`, updateData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
@@ -342,7 +342,10 @@ function EventUpdates() {
                 setUpdatesData(data)
                 setLoading(false)
             })
-            .catch(err => console.log(error))
+            .catch(err => {
+                console.log(error)
+                setError(true)
+            })
     }
 
     useEffect(() => {
@@ -397,7 +400,7 @@ function EventUpdates() {
                                     }}
                                     placeholder={'Update your event'}
                                 />
-                                <IconButton sx={{ color: 'primary.main', alignSelf: 'flex-end' }} disabled={!postProps.value} onClick={handlePostSumbit}>
+                                <IconButton sx={{ color: 'primary.main', alignSelf: 'flex-end' }} disabled={!postProps.value && !img.data} onClick={handlePostSumbit}>
                                     <SendIcon />
                                 </IconButton>
 

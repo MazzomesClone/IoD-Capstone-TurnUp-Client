@@ -3,7 +3,8 @@ import TextField from '@mui/material/TextField';
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
 
-export default function SelectVenue({ options, label, setVenue, venue }) {
+export default function SelectVenue({ options, label, setVenue, venue, }) {
+
     return (
         <Autocomplete
             sx={{ width: '100%' }}

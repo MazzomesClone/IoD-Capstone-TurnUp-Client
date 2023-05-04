@@ -90,8 +90,8 @@ export default function EditVenue() {
             }
         })
             .then(() => {
-                toast.success('Venue edited')
-                navigate(`/venues/${venueId}`)
+                toast.success('Changes saved')
+                navigate(`/venues/${venueId}/details`)
             })
             .catch(err => console.log(err))
     }

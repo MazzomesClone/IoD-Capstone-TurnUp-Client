@@ -29,8 +29,6 @@ export default function GoogleLocationPicker({ setResult }) {
     const [options, setOptions] = useState([]);
     const loaded = useRef(false);
 
-    //console.log(result)
-
     window.initMap = () => loaded.current = true
 
     if (typeof window !== 'undefined' && !loaded.current) {
@@ -120,7 +118,6 @@ export default function GoogleLocationPicker({ setResult }) {
                 setOptions(newValue ? [newValue, ...options] : options);
                 setValue(newValue);
                 fetchPlace({ placeId: newValue.place_id }, (placeResult) => {
-                    //console.log(placeResult)
                     setResult({
                         name: placeResult.name,
                         address: placeResult.formatted_address,

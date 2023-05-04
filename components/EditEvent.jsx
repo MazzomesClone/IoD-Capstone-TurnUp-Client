@@ -35,15 +35,17 @@ export default function EditEvent() {
 
     const { eventId } = useParams()
 
+    const now = dayjs(new Date())
+
     const [ownedVenues, setOwnedVenues] = useState([])
     const [venue, setVenue] = useState(null)
     const { inputProps: nameProps, setValue: setName } = useFormControl('')
     const { inputProps: descriptionProps, setValue: setDescription } = useFormControl('')
-    const [newDate, setNewDate] = useState(dayjs(new Date()))
-    const [newEndDate, setNewEndDate] = useState(dayjs(new Date()))
+    const [newDate, setNewDate] = useState(now)
+    const [newEndDate, setNewEndDate] = useState(now)
     const { img, handleImgChange, setImg } = useImageUpload()
 
-    const isEndDateInvalid = newEndDate.format() < newDate.format()
+    const isEndDateInvalid = newEndDate < newDate
 
     const isMobile = useIsMobile()
     const user = useCurrentUser()
@@ -170,6 +172,7 @@ export default function EditEvent() {
                                 <Stack direction='row' justifyContent='center' mb={1.5} flexWrap='wrap'>
                                     <DateTimePicker
                                         ampm
+                                        minDateTime={now}
                                         sx={{ width: '220px', m: 0.5 }}
                                         value={newDate}
                                         onChange={(value) => {

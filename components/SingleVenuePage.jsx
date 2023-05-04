@@ -2,7 +2,7 @@ import Container from '@mui/material/Container'
 import CircularProgress from '@mui/material/CircularProgress'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import { Link as RouterLink, Outlet, useOutletContext, useParams, useNavigate } from 'react-router-dom'
+import { Link as LinkRouter, Outlet, useOutletContext, useParams, useNavigate } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Paper from '@mui/material/Paper'
@@ -60,9 +60,15 @@ function VenueDetails() {
                     </Grid>
                     <Grid item xs={12} md={7}>
                         <Stack spacing={3} mx={isMobile ? 3 : 0}>
-                            <Typography textAlign='center'>
-                                {description}
-                            </Typography>
+                            {description ?
+                                <Typography textAlign='center'>
+                                    {description}
+                                </Typography>
+                                :
+                                <Typography color='text.secondary' fontStyle='italic' textAlign='center'>
+                                    No description
+                                </Typography>
+                            }
                             {website &&
                                 <Stack direction='row' alignItems='center'>
                                     <LanguageIcon />
@@ -82,6 +88,11 @@ function VenueDetails() {
                                     <EmailIcon />
                                     <Typography fontSize='1.2em' ml={1}>{email}</Typography>
                                 </Stack>
+                            }
+                            {(!website && !email && !phone) &&
+                                <Typography textAlign='center' fontStyle='italic' color='text.secondary' ml={1}>
+                                    No contact information
+                                </Typography>
                             }
                         </Stack>
                     </Grid>
@@ -361,7 +372,7 @@ function SingleVenuePageRouted({ venueId }) {
                     {/* Tabs */}
                     <Tabs sx={{ mt: 3 }} value={currentTab} variant='fullWidth' centered >
                         {VenueTabPack.routePathsAndComponents.map(({ path }) =>
-                            <Tab label={path} value={path} LinkComponent={RouterLink} to={path} key={path} replace />
+                            <Tab label={path} value={path} LinkComponent={LinkRouter} to={path} key={path} replace />
                         )}
                     </Tabs>
 
