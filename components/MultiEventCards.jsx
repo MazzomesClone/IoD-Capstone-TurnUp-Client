@@ -98,7 +98,7 @@ export default function MultiEventCards({ eventsData }) {
     )
 
     return (
-        <Grid container spacing={3} mt={1} px={isMobile ? 3 : 0}>
+        <Grid container spacing={3} mt={1} mb={2} px={isMobile ? 3 : 0}>
             {EventCards}
         </Grid>
     )

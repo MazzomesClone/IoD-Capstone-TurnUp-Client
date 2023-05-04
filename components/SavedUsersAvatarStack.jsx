@@ -16,7 +16,7 @@ export default function SavedUsersAvatarStack({ usersThatSaved }) {
                 )}
             </AvatarGroup>
             <Tooltip title={
-                <List>
+                <List sx={{ mx: -1 }}>
                     {usersThatSaved.map(({ firstName, lastName }, index) =>
                         <ListItem key={index}>
                             <Typography lineHeight={0.3} fontSize='small'>

@@ -207,7 +207,7 @@ export default function NavBar() {
 
     return (
         <>
-            <AppBar position="static" sx={{ transition: 'background 0.2s', zIndex: 2 }}>
+            <AppBar position="sticky" sx={{ transition: 'background 0.2s', zIndex: 2, top: 0 }}>
                 <Toolbar sx={{ display: 'flex' }}>
                     {Logo}
                     {SearchBar}

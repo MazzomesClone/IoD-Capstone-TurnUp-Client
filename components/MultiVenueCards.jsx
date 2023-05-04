@@ -76,7 +76,7 @@ export default function MultiVenueCards({ venuesData }) {
 
     const isMobile = useIsMobile()
 
-    const VenueCards = venuesData?.map(venue => <VenueCard venueData={venue} />)
+    const VenueCards = venuesData?.map((venue, index) => <VenueCard venueData={venue} key={index}/>)
 
     if (venuesData?.length === 0) return (
         <Typography color='text.secondary' mt={3} textAlign='center'>
@@ -85,7 +85,7 @@ export default function MultiVenueCards({ venuesData }) {
     )
 
     return (
-        <Grid container spacing={3} mt={1} px={isMobile ? 3 : 0}>
+        <Grid container spacing={3} mt={1} mb={2} px={isMobile ? 3 : 0}>
             {VenueCards}
         </Grid>
     )
