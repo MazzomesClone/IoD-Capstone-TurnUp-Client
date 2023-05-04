@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -13,6 +12,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { Link as LinkRouter, useNavigate } from 'react-router-dom'
 import { useLoginPage } from '../context/UserContext';
+import { useEffect } from 'react';
 
 function Copyright(props) {
     return (
@@ -29,10 +29,14 @@ function Copyright(props) {
 
 export default function Signin() {
 
-    const { handleLogin, signinMsg } = useLoginPage()
+    const { handleLogin, signinMsg, resetSigninMsg } = useLoginPage()
 
     const navigate = useNavigate()
     const goBack = () => navigate(-1)
+
+    useEffect(() => {
+        return resetSigninMsg
+    }, [])
 
     return (
         <>

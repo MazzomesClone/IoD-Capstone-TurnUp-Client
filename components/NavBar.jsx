@@ -24,7 +24,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import BookmarkAddedIcon from '@mui/icons-material/BookmarkAdded';
+import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import WhereToVoteIcon from '@mui/icons-material/WhereToVote';
 import EventIcon from '@mui/icons-material/Event';
 import FestivalIcon from '@mui/icons-material/Festival';
@@ -229,7 +229,7 @@ function AccountDrawer({ isOpen, setIsOpen, user }) {
     const userPages = [
         {
             label: 'Saved events',
-            icon: <BookmarkAddedIcon />
+            icon: <EventAvailableIcon />
         },
         {
             label: 'Saved venues',

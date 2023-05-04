@@ -9,7 +9,8 @@ import 'dayjs/locale/en-gb';
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+  <>
+    {/* <React.StrictMode> */}
     <BrowserRouter>
       <ThemeWrapper>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='en-gb'>
@@ -17,5 +18,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         </LocalizationProvider>
       </ThemeWrapper>
     </BrowserRouter>
-  </React.StrictMode>,
+    {/* </React.StrictMode> */}
+  </>
 )

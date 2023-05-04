@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { Link as LinkRouter, useNavigate } from 'react-router-dom'
 import { useSignupPage } from '../context/UserContext';
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useFormControl } from '../hooks/useFormControl';
 
 function Copyright(props) {
@@ -31,7 +31,11 @@ export default function SignUp() {
     const navigate = useNavigate()
     const goBack = () => navigate(-1)
 
-    const { handleSignup, signupMsg } = useSignupPage()
+    const { handleSignup, signupMsg, resetSignupMsg } = useSignupPage()
+
+    useEffect(() => {
+        return resetSignupMsg
+    }, [])
 
     let { current: submitDisable } = useRef(false)
 

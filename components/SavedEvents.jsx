@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import { useSavedEvents } from "../context/UserContext"
 import EventDateFilter from "./EventDateFilter"
 import MultiEventCards from "./MultiEventCards"
-import EventIcon from '@mui/icons-material/Event';
+import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import { useState } from "react"
 
 export default function SavedEvents() {
@@ -26,7 +26,7 @@ export default function SavedEvents() {
             <Paper sx={{ p: 3, transition: 'background 0.2s' }}>
                 <Stack direction='row' justifyContent='space-between' flexWrap='wrap'>
                     <Stack direction='row' alignItems='center'>
-                        <EventIcon />
+                        <EventAvailableIcon />
                         <Typography variant="h5" ml={1}>
                             Saved events
                         </Typography>

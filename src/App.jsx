@@ -36,7 +36,7 @@ function App() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        minHeight: '100vh',
+        minHeight: '100dvh',
         bgcolor: 'background.default',
         color: 'text.primary',
         transition: 'background 0.2s'

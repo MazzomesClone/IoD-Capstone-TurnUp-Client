@@ -5,7 +5,7 @@ import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useSavedVenues } from "../context/UserContext"
-import EventIcon from '@mui/icons-material/Event';
+import WhereToVoteIcon from '@mui/icons-material/WhereToVote';
 import MultiVenueCards from "./MultiVenueCards";
 
 export default function SavedVenues() {
@@ -23,7 +23,7 @@ export default function SavedVenues() {
             <Paper sx={{ p: 3, transition: 'background 0.2s' }}>
                 <Stack direction='row' justifyContent='space-between' flexWrap='wrap'>
                     <Stack direction='row' alignItems='center'>
-                        <EventIcon />
+                        <WhereToVoteIcon />
                         <Typography variant="h5" ml={1}>
                             Saved venues
                         </Typography>

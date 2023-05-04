@@ -126,7 +126,9 @@ export default function UserProvider({ children }) {
             user,
             initialised,
             signinMsg,
+            setSigninMsg,
             signupMsg,
+            setSignupMsg,
             savedVenues,
             savedEvents,
             getSavedEvents,
@@ -149,8 +151,9 @@ export function useInitUser() {
 }
 
 export function useLoginPage() {
-    const { handleLogin, signinMsg } = useContext(UserContext)
-    return { handleLogin, signinMsg }
+    const { handleLogin, signinMsg, setSigninMsg } = useContext(UserContext)
+    const resetSigninMsg = () => setSigninMsg({ msg: '', color: 'inherit' })
+    return { handleLogin, signinMsg, resetSigninMsg }
 }
 
 export function useHandleLogout() {
@@ -159,8 +162,9 @@ export function useHandleLogout() {
 }
 
 export function useSignupPage() {
-    const { handleSignup, signupMsg } = useContext(UserContext)
-    return { handleSignup, signupMsg }
+    const { handleSignup, signupMsg, setSignupMsg } = useContext(UserContext)
+    const resetSignupMsg = () => setSignupMsg({ msg: '', color: 'inherit' })
+    return { handleSignup, signupMsg, resetSignupMsg }
 }
 
 export function useCurrentUser() {
