@@ -1,4 +1,4 @@
-#IoD Capstone Project - TurnUp Client
+# IoD Capstone Project - TurnUp Client
 <h4>This repository contains the TurnUp client</h4>
 <p>To use the TurnUp client, you must first setup the backend server by following these instructions:
 </br>https://github.com/MazzomesClone/IoD-Capstone-TurnUp-Server</h4>
