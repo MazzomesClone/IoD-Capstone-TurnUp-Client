@@ -143,6 +143,7 @@ export default function CreateEvent() {
                                             </Typography>
                                             <DateTimePicker
                                                 ampm
+                                                format="DD/MM/YYYY h:mm A"
                                                 minDateTime={now}
                                                 value={date}
                                                 onChange={(value) => {
@@ -159,6 +160,7 @@ export default function CreateEvent() {
                                             </Typography>
                                             <DateTimePicker
                                                 ampm
+                                                format="DD/MM/YYYY h:mm A"
                                                 value={endDate}
                                                 minDateTime={date}
                                                 onChange={(value) => setEndDate(value)}

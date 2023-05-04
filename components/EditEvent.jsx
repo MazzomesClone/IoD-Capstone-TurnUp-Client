@@ -172,6 +172,8 @@ export default function EditEvent() {
                                 <Stack direction='row' justifyContent='center' mb={1.5} flexWrap='wrap'>
                                     <DateTimePicker
                                         ampm
+                                        format="DD/MM/YYYY h:mm A"
+                                        timezone='browser'
                                         minDateTime={now}
                                         sx={{ width: '220px', m: 0.5 }}
                                         value={newDate}
@@ -183,6 +185,7 @@ export default function EditEvent() {
                                     />
                                     <DateTimePicker
                                         ampm
+                                        format="DD/MM/YYYY h:mm A"
                                         sx={{ width: '220px', m: 0.5 }}
                                         value={newEndDate}
                                         minDateTime={newDate}
