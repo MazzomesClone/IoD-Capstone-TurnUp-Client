@@ -1,0 +1,22 @@
+{
+    "routes": [
+        {
+            "src": "/api/.*",
+            "dest": "/api/:path*"
+        },
+        {
+            "src": "/public/.*",
+            "dest": "/public/:path*"
+        }
+    ],
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/"
+        }
+    ],
+    "env": {
+        "VITE_API_URL": "VITE_API_URL",
+        "VITE_GOOGLE_API_KEY": "VITE_GOOGLE_API_KEY"
+    }
+}
