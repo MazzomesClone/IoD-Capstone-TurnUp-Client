@@ -67,13 +67,13 @@ function App() {
               <Route index element={<Navigate to={'events'} replace />} />
               {VenueTabComponents.map(({ path, component }) => <Route path={path} element={component} key={path} />)}
             </Route>
-            <Route path="venues/:venueId/edit" element={<EditVenue />} />
+            <Route path="venues/:venueId/edit" element={<RestrictedPage><EditVenue /></RestrictedPage>} />
 
             <Route path={eventRoute} element={<SingleEventPage />}>
               <Route index element={<Navigate to={'discussion'} replace />} />
               {EventTabComponents.map(({ path, component }) => <Route path={path} element={component} key={path} />)}
             </Route>
-            <Route path="events/:eventId/edit" element={<EditEvent />} />
+            <Route path="events/:eventId/edit" element={<RestrictedPage><EditEvent /></RestrictedPage>} />
 
             <Route path="*" element={<PageNotFound />} />
           </Route>

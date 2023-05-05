@@ -9,5 +9,5 @@ export function useRouteMatch(TabPack) {
         if (match) return route.path
     }
 
-    return null
+    return routePathsAndComponents[0].path
 }

@@ -132,7 +132,7 @@ export default function NavBar() {
                                 <SearchIcon />
                             </SearchIconWrapper>
                             <StyledInputBase
-                                placeholder="Search…"
+                                placeholder="Search"
                                 {...InputLabelProps}
                                 {...InputProps}
                                 {...rest}

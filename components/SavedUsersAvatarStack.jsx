@@ -19,7 +19,7 @@ export default function SavedUsersAvatarStack({ usersThatSaved }) {
                 <List sx={{ mx: -1 }}>
                     {usersThatSaved.map(({ firstName, lastName }, index) =>
                         <ListItem key={index}>
-                            <Typography lineHeight={0.3} fontSize='small'>
+                            <Typography lineHeight={0.3} sx={{ fontSize: '1.1em' }}>
                                 {firstName} {lastName}
                             </Typography>
                         </ListItem>

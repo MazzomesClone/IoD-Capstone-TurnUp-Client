@@ -171,7 +171,7 @@ function SingleVenuePageRouted({ venueId }) {
 
     const [venueEvents, setVenueEvents] = useState(null)
 
-    const { isVenueSaved, saveVenue, unsaveVenue } = useSavedVenues(venueData._id)
+    const { isVenueSaved, saveVenue, unsaveVenue, getSavedVenues } = useSavedVenues(venueData._id)
     const currentTab = useRouteMatch(VenueTabPack)
 
     const isMobile = useIsMobile()
@@ -252,7 +252,6 @@ function SingleVenuePageRouted({ venueId }) {
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
     const handleCancelDialogOpen = () => setCancelDialogOpen(true)
     const handleCancelDialogClose = () => setCancelDialogOpen(false)
-    const { getSavedVenues } = useSavedVenues()
     const { getSavedEvents } = useSavedEvents()
 
     function handleDeleteVenue() {

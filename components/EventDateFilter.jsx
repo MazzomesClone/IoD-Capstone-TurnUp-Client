@@ -7,21 +7,18 @@ import { useMemo, useState } from 'react'
 
 export default function EventDateFilter({ eventsData, setFilteredEventsData, minDateNow = false }) {
 
-    const today = new Date()
+    const [date1, setDate1] = useState(dayjs())
+    const [date2, setDate2] = useState(dayjs().add(1, 'year'))
 
-    const [date1, setDate1] = useState(dayjs(today))
-    const [date2, setDate2] = useState(dayjs(today.setFullYear(today.getFullYear() + 1)))
+    useMemo(() => setFilteredEventsData(eventsData.filter(({ date, endDate }) => {
+        const startTime = dayjs(date)
+        const endTime = dayjs(endDate)
 
-    useMemo(() => setFilteredEventsData(
-        eventsData.filter(({ date, endDate }) => {
-            const currentTime = dayjs(today)
-            const startTime = dayjs(date)
-            const endTime = dayjs(endDate)
-            const startRange = date1.set('hour', currentTime.hour()).set('minute', currentTime.minute())
-            const endRange = date2.set('hour', 23).set('minute', 59)
-            return endTime > startRange && startTime <= endRange
-        })
-    ), [date1, date2])
+        const startRange = (minDateNow && (date1.startOf('day').format() === dayjs().startOf('day').format())) ? date1 : date1.startOf('day')
+        const endRange = date2.endOf('day')
+
+        return endTime > startRange && startTime <= endRange
+    })), [date1, date2])
 
     return (
         <Paper sx={{ p: 3, mt: 3, transition: 'background 0.2s' }}>
@@ -31,6 +28,7 @@ export default function EventDateFilter({ eventsData, setFilteredEventsData, min
                         Which dates?
                     </Typography>
                     <DatePicker
+                        format="DD/MM/YYYY"
                         value={date1}
                         minDate={minDateNow ? dayjs(new Date()) : undefined}
                         onChange={(value) => {
@@ -39,6 +37,7 @@ export default function EventDateFilter({ eventsData, setFilteredEventsData, min
                         }}
                         label='Between this date' />
                     <DatePicker
+                        format="DD/MM/YYYY"
                         value={date2}
                         minDate={date1}
                         onChange={(value) => setDate2(value)}

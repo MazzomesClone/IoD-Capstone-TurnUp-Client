@@ -59,10 +59,10 @@ export default function Hosting() {
                         </Typography>
                     </Stack>
                     <Stack direction='row' spacing={2}>
-                        <Button variant="contained" startIcon={<EventNoteIcon />} LinkComponent={LinkRouter} to='/events/create'>
+                        <Button variant="outlined" startIcon={<EventNoteIcon />} LinkComponent={LinkRouter} to='/events/create'>
                             Event
                         </Button>
-                        <Button variant="contained" startIcon={<AddLocationAltIcon />} LinkComponent={LinkRouter} to='/venues/create'>
+                        <Button variant="outlined" startIcon={<AddLocationAltIcon />} LinkComponent={LinkRouter} to='/venues/create'>
                             Venue
                         </Button>
                     </Stack>

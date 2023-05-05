@@ -35,7 +35,7 @@ export default function EditEvent() {
 
     const { eventId } = useParams()
 
-    const now = dayjs(new Date())
+    const now = dayjs()
 
     const [ownedVenues, setOwnedVenues] = useState([])
     const [venue, setVenue] = useState(null)
@@ -179,7 +179,7 @@ export default function EditEvent() {
                                         value={newDate}
                                         onChange={(value) => {
                                             setNewDate(value)
-                                            setNewEndDate(value)
+                                            if (value > newEndDate) setNewEndDate(value)
                                         }}
                                         label='Start'
                                     />

@@ -461,12 +461,11 @@ function SingleEventPageRouted({ eventId }) {
     const [discussionData, setDiscussionData] = useState(null)
     const [updatesData, setUpdatesData] = useState(null)
 
-    const { isEventSaved, saveEvent, unsaveEvent } = useSavedEvents(eventData._id)
+    const { isEventSaved, saveEvent, unsaveEvent, getSavedEvents } = useSavedEvents(eventData._id)
 
     const isMobile = useIsMobile()
 
     const currentTab = useRouteMatch(EventTabPack)
-    const { getSavedEvents } = useSavedEvents()
     const user = useCurrentUser()
 
     function getEventPageData() {

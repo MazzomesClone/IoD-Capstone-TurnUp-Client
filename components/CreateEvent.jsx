@@ -30,7 +30,7 @@ export default function CreateEvent() {
     const [ownedVenues, setOwnedVenues] = useState([])
     const [venue, setVenue] = useState(null)
 
-    const now = dayjs(new Date())
+    const now = dayjs()
 
     const { inputProps: nameProps } = useFormControl('')
     const { inputProps: descriptionProps } = useFormControl('')
