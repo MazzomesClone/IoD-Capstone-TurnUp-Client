@@ -15,17 +15,28 @@ export default function SavedUsersAvatarStack({ usersThatSaved }) {
                     <Avatar alt={firstName} src={pfp} key={index} />
                 )}
             </AvatarGroup>
-            <Tooltip title={
-                <List sx={{ mx: -1 }}>
-                    {usersThatSaved.map(({ firstName, lastName }, index) =>
-                        <ListItem key={index}>
-                            <Typography lineHeight={0.3} sx={{ fontSize: '1.1em' }}>
-                                {firstName} {lastName}
+            <Tooltip
+                enterTouchDelay={0}
+                leaveTouchDelay={3000}
+                title={
+                    <>
+                        {usersThatSaved.length === 0 ?
+                            <Typography fontStyle='italic' sx={{ fontSize: '1.1em' }}>
+                                No saves yet
                             </Typography>
-                        </ListItem>
-                    )}
-                </List>
-            }>
+                            :
+                            <List sx={{ mx: -1 }}>
+                                {usersThatSaved.map(({ firstName, lastName }, index) =>
+                                    <ListItem key={index}>
+                                        <Typography lineHeight={0.3} sx={{ fontSize: '1.1em' }}>
+                                            {firstName} {lastName}
+                                        </Typography>
+                                    </ListItem>
+                                )}
+                            </List>
+                        }
+                    </>
+                }>
                 <Typography fontSize='small' color='text.secondary' textAlign='right'>
                     {usersThatSaved.length} {usersThatSaved.length === 1 ? 'person' : 'people'} saved
                 </Typography>
