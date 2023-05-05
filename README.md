@@ -6,7 +6,7 @@
 <p><strong>1. </strong>Clone the respository and <code>cd</code> into the root directory</p>
 <p><strong>2. </strong>Run <code>npm install</code> to install the required dependencies</p>
 <p><strong>3. </strong>create a .env file in the root directory and add the following values:</p>
-<code>VITE_API_URL = *SERVER URL (the URL is http://localhost:3000 by default)*
+<code>VITE_API_URL = http://localhost:3000
  VITE_GOOGLE_API_KEY = *YOUR GOOGLE PLACES API KEY*
 </code>
 </br>
