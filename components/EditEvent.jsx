@@ -11,7 +11,7 @@ import TextField from "@mui/material/TextField";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom'
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { useCurrentUser } from "../context/UserContext";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { useFormControl } from "../hooks/useFormControl";
@@ -23,6 +23,25 @@ import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import { DateTimePicker } from "@mui/x-date-pickers";
 import SelectVenue from "./SelectVenue";
+
+function newDatesReducer(state, action) {
+    switch (action.type) {
+        case 'set-new-date':
+            if (action.newValue > state.newEndDate) {
+                return {
+                    newDate: action.newValue,
+                    newEndDate: action.newValue
+                }
+            }
+            return { ...state, newDate: action.newValue }
+
+        case 'set-new-end-date':
+            return { ...state, newEndDate: action.newValue }
+
+        default:
+            break;
+    }
+}
 
 export default function EditEvent() {
 
@@ -41,8 +60,8 @@ export default function EditEvent() {
     const [venue, setVenue] = useState(null)
     const { inputProps: nameProps, setValue: setName } = useFormControl('')
     const { inputProps: descriptionProps, setValue: setDescription } = useFormControl('')
-    const [newDate, setNewDate] = useState(now)
-    const [newEndDate, setNewEndDate] = useState(now)
+    const [newDatesState, dispatchNewDates] = useReducer(newDatesReducer, { newDate: now, newEndDate: now })
+    const { newDate, newEndDate } = newDatesState
     const { img, handleImgChange, setImg } = useImageUpload()
 
     const isEndDateInvalid = newEndDate < newDate
@@ -80,8 +99,8 @@ export default function EditEvent() {
         const { name, date, endDate, primaryImage, description } = data
         setVenue(ownedVenues.find(venue => venue._id === data.venueId._id))
         setName(name)
-        setNewDate(dayjs(date))
-        setNewEndDate(dayjs(endDate))
+        dispatchNewDates({ type: 'set-new-date', newValue: dayjs(date) })
+        dispatchNewDates({ type: 'set-new-end-date', newValue: dayjs(endDate) })
         setDescription(description)
         setImg({ preview: primaryImage, data: '' })
     }
@@ -168,7 +187,6 @@ export default function EditEvent() {
                         <Grid container spacing={3}>
                             <Grid item xs={12} md={7}>
 
-                                {/* Event date and saved avatars */}
                                 <Stack direction='row' justifyContent='center' mb={1.5} flexWrap='wrap'>
                                     <DateTimePicker
                                         ampm
@@ -177,10 +195,10 @@ export default function EditEvent() {
                                         minDateTime={now}
                                         sx={{ width: '220px', m: 0.5 }}
                                         value={newDate}
-                                        onChange={(value) => {
-                                            setNewDate(value)
-                                            if (value > newEndDate) setNewEndDate(value)
-                                        }}
+                                        onChange={(value) => dispatchNewDates({
+                                            type: 'set-new-date',
+                                            newValue: value
+                                        })}
                                         label='Start'
                                     />
                                     <DateTimePicker
@@ -189,24 +207,24 @@ export default function EditEvent() {
                                         sx={{ width: '220px', m: 0.5 }}
                                         value={newEndDate}
                                         minDateTime={newDate}
-                                        onChange={(value) => setNewEndDate(value)}
+                                        onChange={(value) => dispatchNewDates({
+                                            type: 'set-new-end-date',
+                                            newValue: value
+                                        })}
                                         label='End'
                                     />
                                 </Stack>
 
                                 <Divider />
 
-                                {/* Event name */}
                                 <Stack direction='row' alignItems='center' mb={1} mt={2}>
                                     <TextField fullWidth variant='standard' label='Event name' required {...nameProps} />
                                 </Stack>
 
-                                {/* Description */}
                                 <TextField multiline fullWidth rows={7} variant='standard' label='Description' {...descriptionProps} />
 
                             </Grid>
 
-                            {/* Venue and Map */}
                             <Grid item xs={12} md={5}>
                                 <Stack spacing={2}>
                                     <SelectVenue venue={venue} setVenue={setVenue} options={ownedVenues} label='name' />
