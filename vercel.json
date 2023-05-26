@@ -1,19 +1,12 @@
 {
-    "version": 2,
-    "builds": [
+    "rewrites": [
         {
-            "src": "vite.config.js",
-            "use": "@vercel/node"
-        }
-    ],
-    "routes": [
-        {
-            "src": "/api/(.*)",
-            "dest": "vite.config.js"
+            "source": "/api/:match*",
+            "destination": "http://turnup-server-env.eba-ucuk2zpq.ap-southeast-2.elasticbeanstalk.com/api/:match*"
         },
         {
-            "src": "/public/(.*)",
-            "dest": "vite.config.js"
+            "source": "/public/:match*",
+            "destination": "http://turnup-server-env.eba-ucuk2zpq.ap-southeast-2.elasticbeanstalk.com/public/:match*"
         }
     ]
 }
