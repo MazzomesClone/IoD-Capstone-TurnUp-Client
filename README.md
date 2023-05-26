@@ -1,5 +1,8 @@
 # IoD Capstone Project - TurnUp Client
 <h3>This project is live! Check it out in the <a href="https://iod-capstone-turn-up-client.vercel.app">Vercel deployment</a></h3>
+<h3>Sign in as John Smith to see his hosted venues and events, or create your own account!</h3>
+<p>Email: john@smith.com</p>
+<p>Password: jsmith</p>
 <h4>This repository contains the TurnUp client</h4>
 <p>To use the TurnUp client, you must first setup the backend server by following these instructions:
 </br>https://github.com/MazzomesClone/IoD-Capstone-TurnUp-Server</h4>
