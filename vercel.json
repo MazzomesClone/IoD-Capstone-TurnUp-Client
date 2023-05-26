@@ -2,11 +2,11 @@
     "rewrites": [
         {
             "source": "/api/:match*",
-            "destination": "${env.VITE_API_URL}/api/:match*"
+            "destination": "${VITE_API_URL}/api/:match*"
         },
         {
             "source": "/public/:match*",
-            "destination": "${env.VITE_API_URL}/public/:match*"
+            "destination": "${VITE_API_URL}/public/:match*"
         },
         {
             "source": "/(.*)",
