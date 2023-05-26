@@ -11,8 +11,8 @@
     ],
     "routes": [
         {
-            "src": "/[^.]+",
-            "dest": "/",
+            "source": "/[^.]+",
+            "destination": "/",
             "status": 200
         }
     ]
