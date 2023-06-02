@@ -1,5 +1,6 @@
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
+import LoadingButton from '@mui/lab/LoadingButton';
 import TextField from '@mui/material/TextField';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
@@ -31,7 +32,7 @@ export default function SignUp() {
     const navigate = useNavigate()
     const goBack = () => navigate(-1)
 
-    const { handleSignup, signupMsg, resetSignupMsg } = useSignupPage()
+    const { handleSignup, signupMsg, resetSignupMsg, signupLoading } = useSignupPage()
 
     useEffect(() => {
         return resetSignupMsg
@@ -142,7 +143,8 @@ export default function SignUp() {
                             </Grid>
                         </Grid>
                         <Typography color={signupMsg.color} sx={{ mt: 2, mb: 1 }}>{signupMsg.msg}</Typography>
-                        <Button
+                        <LoadingButton
+                            loading={signupLoading}
                             type="submit"
                             fullWidth
                             variant="contained"
@@ -150,7 +152,7 @@ export default function SignUp() {
                             disabled={submitDisable}
                         >
                             Sign Up
-                        </Button>
+                        </LoadingButton>
                         <Grid container justifyContent="flex-start">
                             <Grid item>
                                 <Link variant="body2" component={LinkRouter} to='/signin' replace>

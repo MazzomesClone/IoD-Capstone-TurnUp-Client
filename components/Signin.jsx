@@ -1,5 +1,6 @@
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
+import LoadingButton from '@mui/lab/LoadingButton';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
@@ -29,7 +30,7 @@ function Copyright(props) {
 
 export default function Signin() {
 
-    const { handleLogin, signinMsg, resetSigninMsg } = useLoginPage()
+    const { handleLogin, signinMsg, resetSigninMsg, signinLoading } = useLoginPage()
 
     const navigate = useNavigate()
     const goBack = () => navigate(-1)
@@ -92,14 +93,23 @@ export default function Signin() {
                             label="Remember me"
                         />
                         <Typography color={signinMsg.color} sx={{ mt: 2, mb: 1 }}>{signinMsg.msg}</Typography>
-                        <Button
+                        {/* <Button
                             type="submit"
                             fullWidth
                             variant="contained"
                             sx={{ mb: 2 }}
                         >
                             Sign In
-                        </Button>
+                        </Button> */}
+                        <LoadingButton
+                            loading={signinLoading}
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            sx={{ mb: 2 }}
+                        >
+                            Sign In
+                        </LoadingButton>
                         <Grid container>
                             <Grid item>
                                 <Link variant="body2" component={LinkRouter} to='/signup' replace>

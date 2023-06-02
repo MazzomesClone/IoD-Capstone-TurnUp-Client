@@ -26,6 +26,9 @@ export default function UserProvider({ children }) {
     const [savedVenues, setSavedVenues] = useState(null)
     const [savedEvents, setSavedEvents] = useState(null)
 
+    const [signinLoading, setSigninLoading] = useState(false)
+    const [signupLoading, setSignupLoading] = useState(false)
+
     const [signinMsg, setSigninMsg] = useState({ msg: '', color: 'inherit' })
     const [signupMsg, setSignupMsg] = useState({ msg: '', color: 'inherit' })
 
@@ -68,12 +71,14 @@ export default function UserProvider({ children }) {
     async function handleLogin(e) {
         try {
             e.preventDefault()
+            setSigninLoading(true)
 
             const signinData = Object.fromEntries(new FormData(e.target))
             await axios.post('/api/users/login', signinData)
 
             const userData = await initUser()
 
+            setSigninLoading(false)
             setSigninMsg({ msg: '', color: 'inherit' })
             toast(`👋 Welcome ${userData.firstName}!`, { theme: userData?.themeMode ? userData.themeMode : 'light' })
             navigate(-1)
@@ -81,6 +86,7 @@ export default function UserProvider({ children }) {
         } catch (err) {
             console.log(err)
             if (err.response.status === 403) {
+                setSigninLoading(false)
                 setSigninMsg({ msg: 'Incorrect username or password', color: 'error.main' })
             }
         }
@@ -103,15 +109,20 @@ export default function UserProvider({ children }) {
     async function handleSignup(e) {
         try {
             e.preventDefault()
+            setSignupLoading(true)
+
             const signupData = Object.fromEntries(new FormData(e.target))
             signupData.password2 = undefined
             await axios.post('/api/users/new', signupData)
+
+            setSignupLoading(false)
             setSignupMsg({ msg: '', color: 'inherit' })
             setSigninMsg({ msg: 'Account created! Please sign in', color: 'success.main' })
             navigate('/signin', { replace: true })
 
         } catch (err) {
             if (err.response.status === 409) {
+                setSignupLoading(false)
                 setSignupMsg({ msg: 'An account with this email already exists', color: 'error.main' })
             }
             console.log(err.message)
@@ -123,6 +134,8 @@ export default function UserProvider({ children }) {
             handleLogin,
             handleLogout,
             handleSignup,
+            signinLoading,
+            signupLoading,
             user,
             initialised,
             signinMsg,
@@ -151,9 +164,9 @@ export function useInitUser() {
 }
 
 export function useLoginPage() {
-    const { handleLogin, signinMsg, setSigninMsg } = useContext(UserContext)
+    const { handleLogin, signinMsg, setSigninMsg, signinLoading } = useContext(UserContext)
     const resetSigninMsg = () => setSigninMsg({ msg: '', color: 'inherit' })
-    return { handleLogin, signinMsg, resetSigninMsg }
+    return { handleLogin, signinMsg, resetSigninMsg, signinLoading }
 }
 
 export function useHandleLogout() {
@@ -162,9 +175,9 @@ export function useHandleLogout() {
 }
 
 export function useSignupPage() {
-    const { handleSignup, signupMsg, setSignupMsg } = useContext(UserContext)
+    const { handleSignup, signupMsg, setSignupMsg, signupLoading } = useContext(UserContext)
     const resetSignupMsg = () => setSignupMsg({ msg: '', color: 'inherit' })
-    return { handleSignup, signupMsg, resetSignupMsg }
+    return { handleSignup, signupMsg, resetSignupMsg, signupLoading }
 }
 
 export function useCurrentUser() {
